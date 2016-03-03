@@ -7,7 +7,7 @@ OBJCOPY = $(ARMGNU)-objcopy
 OBJDUMP = $(ARMGNU)-objdump
 STRIP = $(ARMGNU)-strip
 
-CPPFLAGS = -Iinclude/
+CPPFLAGS = -Iinclude/ -Icpu/
 CFLAGS = -std=c99 -Wall -Og -g -ffreestanding $(CPPFLAGS)
 ASFLAGS =
 LDFLAGS  = -nostdlib -T memmap -Llib/
@@ -15,8 +15,8 @@ LDLIBS = -lpi -lgcc
 
 .SUFFIXES:
 
-NAME = main
-C_SRCS = $(NAME).c keyboard.c console.c circular.c cstart.c malloc.c printf.c gl.c fb.c
+NAME = main_cpu
+C_SRCS = $(NAME).c cstart.c malloc.c printf.c gl.c fb.c cpu/CPU.c
 S_SRCS = start.s
 
 all : $(NAME).bin
