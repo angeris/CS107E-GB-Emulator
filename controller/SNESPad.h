@@ -1,6 +1,24 @@
 #ifndef SNESPAD_H
 #define SNESPAD_H
 
+/* SNES Controller Schematic
+ ----------------------------- ---------------------
+|                             |                      \
+| (1)     (2)     (3)     (4) |   (5)     (6)     (7) |
+|                             |                      /
+ ----------------------------- ---------------------
+
+Pin   Description   Wire Color
+===   ===========   ==========
+ 1    +5v (power)   ?
+ 2    Clock         ?
+ 3    Latch         ?
+ 4    Data1         ?
+ 5    Data2         ?
+ 6    IOBit         ?
+ 7    Ground        ?
+ */
+
 /* SNES GamePad Hex Codes */
 #define BTN_B 0x01
 #define BTN_Y 0x02

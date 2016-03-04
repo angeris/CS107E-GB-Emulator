@@ -12,8 +12,10 @@ void interrupt_vector(unsigned pc) {
 }
 
 void main(void) {
-	int x = getButtons();
+
+	controller_init();	
+	controller_state cs = getState();
     while(1) {
-    	printf("x = %d\n", x);
+    	printf("sizeof(cs) = %d\n", sizeof(cs));
     }
 }
