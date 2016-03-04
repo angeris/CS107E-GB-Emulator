@@ -16,11 +16,28 @@ LDLIBS = -lpi -lgcc
 .SUFFIXES:
 
 NAME = main_cpu
-C_SRCS = $(NAME).c cstart.c malloc.c printf.c gl.c fb.c cpu/CPU.c
+CONTROLLER = main_controller
+
+C_SRCS = $(NAME).c cstart.c malloc.c printf.c gl.c fb.c cpu/CPU.c controller/controller.c
 S_SRCS = start.s
+
+CONTROLLER_SRCS = $(CONTROLLER).c cstart.c malloc.c printf.c gl.c fb.c controller/controller.c
 
 all : $(NAME).bin
 
+# Controller Specific Make - don't know if this is correct/efficient but it works
+$(CONTROLLER).exe : $(S_SRCS:.s=.o) $(CONTROLLER_SRCS:.c=.o)
+	$(LD) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+$(CONTROLLER).bin : $(CONTROLLER).exe
+	$(OBJCOPY) $< -O binary $@
+
+controller : $(CONTROLLER).bin
+
+install-controller: $(CONTROLLER).bin
+	rpi-install.py $(CONTROLLER).bin
+
+# General Make Rules
 %.o: %.s
 	$(AS) $(ASFLAGS) $< -o $@
 
@@ -40,6 +57,7 @@ all : $(NAME).bin
 clean :
 	rm -f *.bin *.exe *.o *.d *.list
 	rm -f lib/*.bin lib/*.exe lib/*.o lib/*.d lib/*.list
+	clear
 
 install: $(NAME).bin
 	rpi-install.py $(NAME).bin
