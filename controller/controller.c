@@ -4,11 +4,9 @@
 #include "proto.h"
 #include "printf.h"
 
-#define LATCH GPIO_PIN3
-#define CLOCK GPIO_PIN4
-#define DATA GPIO_PIN5
-
-controller_state cs = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+const unsigned CLOCK = GPIO_PIN23;
+const unsigned DATA = GPIO_PIN24;
+const unsigned LATCH = GPIO_PIN25;
 
 void controller_init(void) {
 	gpio_set_function(LATCH, GPIO_FUNC_OUTPUT);
@@ -27,5 +25,32 @@ void clock_pulse(void) {
 }
 
 controller_state getState(void) {
+	controller_state cs;
+
+	latch();
+	cs.B = !gpio_read(DATA);
+	clock_pulse();
+	cs.Y = !gpio_read(DATA);
+	clock_pulse();
+	cs.SELECT = !gpio_read(DATA);
+	clock_pulse();
+	cs.START = !gpio_read(DATA);
+	clock_pulse();
+	cs.UP = !gpio_read(DATA);
+	clock_pulse();
+	cs.DOWN = !gpio_read(DATA);
+	clock_pulse();
+	cs.LEFT = !gpio_read(DATA);
+	clock_pulse();
+	cs.RIGHT = !gpio_read(DATA);
+	clock_pulse();
+	cs.A = !gpio_read(DATA);
+	clock_pulse();
+	cs.X = !gpio_read(DATA);
+	clock_pulse();
+	cs.L = !gpio_read(DATA);
+	clock_pulse();
+	cs.R = !gpio_read(DATA);
+
 	return cs;
 }

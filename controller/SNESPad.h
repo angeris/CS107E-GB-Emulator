@@ -10,13 +10,13 @@
 
 Pin   Description   Wire Color
 ===   ===========   ==========
- 1    +5v (power)   ?
- 2    Clock         ?
- 3    Latch         ?
- 4    Data1         ?
+ 1    +5v (power)   Red
+ 2    Clock         Blue
+ 3    Latch         Gray
+ 4    Data1         Purple
  5    Data2         ?
  6    IOBit         ?
- 7    Ground        ?
+ 7    Ground        White
  */
 
 /* SNES GamePad Hex Codes */
