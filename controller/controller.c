@@ -19,6 +19,8 @@ void latch(void) {
 	gpio_write(LATCH, 0);
 }
 
+// Are you sure the clock on the controller is fast enough? Doesn't
+// need interrupts or anything?
 void clock_pulse(void) {
 	gpio_write(CLOCK, 1);
 	gpio_write(CLOCK, 0);
