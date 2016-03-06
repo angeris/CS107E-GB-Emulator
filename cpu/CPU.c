@@ -26,12 +26,14 @@ gb_short cpu_read8() {
     return _gb_rom[_cpr.PC++]; 
 }
 
+// TODO: Fix this. Should read gb_long
 gb_short cpu_read16() {
     gb_short t = _gb_rom[_cpr.PC];
     _cpr.PC += 2;
     return t;
 }
 
+// TODO: Fix this... not rom.
 void ram_write8(gb_long addr, gb_short s) {
     _gb_rom[addr] = s;
 }
@@ -65,6 +67,7 @@ static inline void setHL(gb_long l) {
 }
 
 // Read helpers (for clarity)
+// TODO: Cast to gb_longs before shifts.
 static inline gb_short A() { return _cpr.A; }
 static inline gb_short F() { return _cpr.F; }
 static inline gb_short B() { return _cpr.B; }
@@ -137,19 +140,21 @@ static gb_short dec8(gb_short reg) {
 static gb_long dec16(gb_long reg) {
     return reg-1;
 }
-static gb_short rot8(gb_short reg) {
+static gb_short rot8_l(gb_short reg) {
     gb_short lbit = !!(reg & 1<<7);
     reg = reg<<1 | lbit; 
     setCarr(lbit);
     setZero(0);
     setHalf(0);
     setSubs(0);
+    return reg;
 }
 static gb_long add16(gb_long a, gb_long b) {
     unsigned f = (unsigned)a + (unsigned)b;
     setSubs(0);
     setCarr(f>0xFFFF);
     setHalf((a&0xFFF) + (b&0xFFF) > 0xFFF);
+    return (gb_long)f;
 }
 
 // CPU operations
@@ -176,7 +181,7 @@ void exec_op(gb_short op_code) {
         setB(cpu_read8());
         break;
     case 0x07:
-        setA( rot8( A() ) );
+        setA( rot8_l( A() ) );
         break;
     case 0x08:
         ram_write16(cpu_read16(), SP());

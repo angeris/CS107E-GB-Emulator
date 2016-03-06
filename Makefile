@@ -55,9 +55,8 @@ install-controller: $(CONTROLLER).bin
 	$(OBJDUMP) -d --no-show-raw-insn $< > $@
 
 clean :
-	rm -f *.bin *.exe *.o *.d *.list
-	rm -f lib/*.bin lib/*.exe lib/*.o lib/*.d lib/*.list
-	clear
+	rm -rf *.bin *.exe *.o *.d *.list
+	rm -rf lib/*.bin lib/*.exe lib/*.o lib/*.d lib/*.list
 
 install: $(NAME).bin
 	rpi-install.py $(NAME).bin
