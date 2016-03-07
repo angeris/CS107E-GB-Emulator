@@ -20,7 +20,10 @@
  * FFFF        Interrupt Enable Register
  */
 
-#define SIZE_KB  8192
+#define SIZE_KB   8192
+#define ROM_SIZE  -1
+#define VRAM_SIZE 8192
+#define MEM_SIZE  0x10000 // 0x0000 - 0xFFFF
 
 // Units of work
 typedef uint16_t gb_long;
@@ -28,14 +31,19 @@ typedef int16_t  gb_long_s;
 typedef uint8_t  gb_short;
 typedef int8_t   gb_short_s;
 
-// Memory map.
-static gb_short _gb_rom[ROM_SIZE*SIZE_KB]; 
+// Memory map
+extern gb_short GB_ROM[ROM_SIZE]; // To be read from a given .h file.
+gb_short *_gb_ram;
+gb_short _vram[VRAM_SIZE];
+gb_short _gb_mem[MEM_SIZE];
 
-gb_short read8(gb_long addr);
-gb_long read16(gb_long addr);
+// Other definitions
+gb_short   read8(gb_long addr);
+gb_short_s read8s(gb_long addr);
+gb_long    read16(gb_long addr);
 
+// Available functions
 void write8(gb_long addr, gb_short val);
 void write16(gb_long addr, gb_long val);
-
 
 #endif
