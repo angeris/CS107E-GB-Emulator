@@ -3,6 +3,7 @@
 #include "gpio.h"
 #include "proto.h"
 #include "printf.h"
+#include "timer.h"
 
 const unsigned CLOCK = GPIO_PIN23;
 const unsigned DATA = GPIO_PIN24;
@@ -27,9 +28,12 @@ void clock_pulse(void) {
 }
 
 controller_state getState(void) {
+	delay(10);
+
 	controller_state cs;
 
 	latch();
+
 	cs.B = !gpio_read(DATA);
 	clock_pulse();
 	cs.Y = !gpio_read(DATA);

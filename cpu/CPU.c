@@ -26,6 +26,7 @@ gb_short cpu_read8() {
     return _gb_rom[_cpr.PC++]; 
 }
 
+
 // TODO: Fix this. Should read gb_long
 gb_short cpu_read16() {
     gb_short t = _gb_rom[_cpr.PC];
@@ -122,9 +123,9 @@ gb_short isCarr() { return !!(F_CARR & _cpr.F); }
 // Helpers
 static gb_short inc8(gb_short reg) {
     reg++;
-    setZero(!reg);
-    isSubs(0);
-    isHalf(!(reg & 0xF));
+    setzero(!reg);
+    issubs(0);
+    ishalf(!(reg & 0xf));
     return reg;
 }
 static gb_long inc16(gb_long reg) {
@@ -132,23 +133,55 @@ static gb_long inc16(gb_long reg) {
 }
 static gb_short dec8(gb_short reg) {
     reg--;
-    setZero(!reg);
-    isSubs(1);
-    isHalf(!(reg & 0xF));
+    setzero(!reg);
+    issubs(1);
+    ishalf(!(reg & 0xf));
     return reg;
 }
 static gb_long dec16(gb_long reg) {
     return reg-1;
 }
+
 static gb_short rot8_l(gb_short reg) {
     gb_short lbit = !!(reg & 1<<7);
     reg = reg<<1 | lbit; 
+    setcarr(lbit);
+    setzero(0);
+    sethalf(0);
+    setsubs(0);
+    return reg;
+}
+
+static gb_short rot8_r(gb_short reg) {
+    gb_short rbit = reg & 1;
+    reg = (reg >> 1) | (rbit << 7);
+    setcarr(rbit);
+    setzero(0);
+    sethalf(0);
+    setsubs(0);
+    return reg;
+}
+
+static gb_short rot8_r_carry(gb_short reg) {
+    gb_short rbit = reg & 1;
+    reg = (reg >> 1) | (isCarr() << 7); 
+    setCarr(rbit);
+    setZero(0);
+    setHalf(0);
+    setSubs(0);
+    return reg;
+}
+
+static gb_short rot8_l_carry(gb_short reg) {
+    gb_short lbit = !!(reg & (1 << 7));
+    reg = (reg >> 1) | (isCarr() << 7); 
     setCarr(lbit);
     setZero(0);
     setHalf(0);
     setSubs(0);
     return reg;
 }
+
 static gb_long add16(gb_long a, gb_long b) {
     unsigned f = (unsigned)a + (unsigned)b;
     setSubs(0);
@@ -161,53 +194,101 @@ static gb_long add16(gb_long a, gb_long b) {
 void exec_op(gb_short op_code) {
     switch(op_code) {
     case 0x00:
-        break;
+      break;
     case 0x01:
-        setBC(cpu_read16()); 
-        break;
+      setBC(cpu_read16()); 
+      break;
     case 0x02:
-        ram_write8(BC(), A());
-        break;
+      ram_write8(BC(), A());
+      break;
     case 0x03:
-        setBC( inc16( BC() ) );
-        break;
+      setBC( inc16( BC() ) );
+      break;
     case 0x04:
-        setB( inc8( B() ) );
-        break;
+      setB( inc8( B() ) );
+      break;
     case 0x05:
-        setB( dec8( B() ) );
-        break;
+      setB( dec8( B() ) );
+      break;
     case 0x06:
-        setB(cpu_read8());
-        break;
+      setB(cpu_read8());
+      break;
     case 0x07:
-        setA( rot8_l( A() ) );
-        break;
+      setA( rot8_l( A() ) );
+      break;
     case 0x08:
-        ram_write16(cpu_read16(), SP());
-        break;
+      ram_write16(cpu_read16(), SP());
+      break;
     case 0x09:
-        setHL( add16(HL(), BC()) );
-        break; 
+      setHL( add16(HL(), BC()) );
+      break; 
     case 0x0A:
-        setA( read16(BC()) );
-        break;
+      setA( read16(BC()) );
+      break;
     case 0x0B:
-        setBC( dec16( BC() ) );
-        break;
+      setBC( dec16( BC() ) );
+      break;
     case 0x0C:
-        setC( inc8( C() ) );
-        break;
+      setC( inc8( C() ) );
+      break;
     case 0x0D:
-        setC( dec8( C() ) );
-        break;
+      setC( dec8( C() ) );
+      break;
     case 0x0E:
-        setC( cpu_read8() );
-        break;
+      setC( cpu_read8() );
+      break;
     case 0x0F:
+      setA( rot8_r( A() ) );
+      break;
+    case 0x10:
+      break;
+    case 0x11:
+      setDE(cpu_read16()); 
+      break;
+    case 0x12:
+      ram_write8((DE), A());
+      break;
+    case 0x13:
+      setDE( inc16( DE() ) );
+    case 0x14:
+      setD( inc8( D() ) );
+      break;
+    case 0x15:
+      setD( dec8( D() ) );
+      break;
+    case 0x16:
+      setD(cpu_read8());
+      break;
+    case 0x17:
+      setA( rot8_l_carry( A() ) );
+      break;
+    case 0x18:
+      setPC( _cpr.PC + read8s(_cpr.PC) + 1);
+      break;
+    case 0x19:
+      setHL( add16(HL(), DE()) );
+      break;
+    case 0x1A:
+      setA( read16(DE()) );
+      break;
+    case 0x1B:
+      setDE( dec16( DE() ) );
+      break;
+    case 0x1C:
+      setE( inc8( E() ) );
+      break;
+    case 0x1D:
+      setE( dec8( E() ) );
+      break;
+    case 0x1E:
+      setE( cpu_read8());
+      break;
+    case 0x1F:
+      setA(rot8_r_carry(A()));
+      break;
+      
 
-
-            
+	     
     }
-        
+
 }

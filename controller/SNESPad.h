@@ -10,7 +10,7 @@
 
 Pin   Description   Wire Color
 ===   ===========   ==========
- 1    +5v (power)   Red
+ 1    +5v (power)   Reds
  2    Clock         Blue
  3    Latch         Gray
  4    Data1         Purple
