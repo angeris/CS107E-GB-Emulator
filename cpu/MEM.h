@@ -21,7 +21,7 @@
  */
 
 #define SIZE_KB   8192
-#define ROM_SIZE  -1
+#define ROM_SIZE  -1 // You won't be able to compile until after the H file for the rom is copied!
 #define VRAM_SIZE 8192
 #define MEM_SIZE  0x10000 // 0x0000 - 0xFFFF
 

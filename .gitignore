@@ -31,9 +31,13 @@
 # Debug files
 *.dSYM/
 
+# Random other files
+*.gb
+roms/*.h
+
+*.DS_Store
 *.d
 *.swp
 .*.swp
 *~
 *.bin
-
