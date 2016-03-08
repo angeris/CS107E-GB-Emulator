@@ -23,7 +23,7 @@ S_SRCS = start.s
 
 ROMS = Pokemon_Red.gb Tetris.gb
 
-CONTROLLER_SRCS = $(CONTROLLER).c cstart.c malloc.c printf.c gl.c fb.c controller/controller.c
+CONTROLLER_SRCS = $(CONTROLLER).c cstart.c malloc.c printf.c gl.c fb.c controller/controller.c controller/interrupt.c
 
 all : $(NAME).bin
 
@@ -59,6 +59,7 @@ install-controller: $(CONTROLLER).bin
 clean :
 	rm -rf *.bin *.exe *.o *.d *.list
 	rm -rf lib/*.bin lib/*.exe lib/*.o lib/*.d lib/*.list
+	clear
 
 install: $(NAME).bin
 	rpi-install.py $(NAME).bin

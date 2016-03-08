@@ -1,6 +1,9 @@
 #include "proto.h"
 #include "gpio.h"
+#include "timer.h"
 #include "controller/controller.h"
+
+controller_state cs;
 
 void impossible_vector(unsigned pc) {
     printf("impossible exception at pc=%x\n", pc);
@@ -8,13 +11,20 @@ void impossible_vector(unsigned pc) {
 }
 
 void interrupt_vector(unsigned pc) {
-    return;
+  	controller_int_handler(pc);
 }
 
 void main(void) {
+	delay(5);
 	controller_init();	
-	controller_state cs;
     while(1) {
+    	delay(2);
+    	co_printtime();
+    	printf("count = %d\n", getCount());
+    }
+}
+
+void printtest() {
 		cs = getState();
     	printf("sizeof(cs) = %d\n", sizeof(cs));
     	printf("cs.B = %d\n", cs.B);
@@ -30,5 +40,4 @@ void main(void) {
 		printf("cs.L = %d\n", cs.L);
 		printf("cs.R = %d\n", cs.R);
 		printf("---------------");
-    }
 }
