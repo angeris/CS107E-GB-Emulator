@@ -8,6 +8,5 @@
 
 void clearTimerInterrupt(void);
 void scheduleInterrupt(void);
-void printTime(void);
 
 #endif

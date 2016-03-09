@@ -1,7 +1,7 @@
 #include "proto.h"
 #include "gpio.h"
 #include "timer.h"
-#include "controller/controller.h"
+#include "controller.h"
 
 controller_state cs;
 
@@ -12,16 +12,6 @@ void impossible_vector(unsigned pc) {
 
 void interrupt_vector(unsigned pc) {
   	controller_int_handler(pc);
-}
-
-void main(void) {
-	delay(5);
-	controller_init();	
-    while(1) {
-    	delay(2);
-    	co_printtime();
-    	printf("count = %d\n", getCount());
-    }
 }
 
 void printtest() {
@@ -39,5 +29,16 @@ void printtest() {
 		printf("cs.X = %d\n", cs.X);
 		printf("cs.L = %d\n", cs.L);
 		printf("cs.R = %d\n", cs.R);
-		printf("---------------");
+		printf("---------------\n");
+		printf("count = %d\n", getCount());
+		printf("---------------\n");
+}
+
+void main(void) {
+	delay(3);
+	controller_init();	
+    while(1) {
+    	printf("count = %d\n", getCount());
+    	// printtest();
+    }
 }

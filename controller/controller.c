@@ -15,27 +15,30 @@ const unsigned LATCH = GPIO_PIN25;
 #define RPI_INT_DISABLE_1            0x2000B21C
 #define RPI_INT_DISABLE_2            0x2000B220
 
+// static unsigned int *Enable_IRQs1 = (unsigned int*)0x2000B210;
+
 void controller_init(void) {
   	gpio_init();
   	printf("controller init\n");
 
-	gpio_set_function(LATCH, GPIO_FUNC_OUTPUT);
-	gpio_set_function(CLOCK, GPIO_FUNC_OUTPUT);
-	gpio_set_function(DATA, GPIO_FUNC_INPUT);
-
   	// Ensure all interrupts are disabled. 
   	PUT32(RPI_INT_DISABLE_1, 0xFFFFFFFF);
   	PUT32(RPI_INT_DISABLE_2, 0xFFFFFFFF);
+	
+	gpio_set_output(LATCH);
+	gpio_set_output(CLOCK);
+	gpio_set_input(DATA);
+	gpio_detect_falling_edge(DATA);
+
+	// setup_timer_init(100);
 
 	// Enable Timer Interrupt 1
-	PUT32(RPI_INT_ENABLE_1, 2); 
+	// *Enable_IRQs1 = 1 << 1;
+	PUT32(RPI_INT_ENABLE_1, 0x00000002);
 
 	// Enable interrupts
-  	system_enable_interrupts(); 
-}
-
-void co_printtime(void) {
-	printTime();
+  	system_enable_interrupts();
+	scheduleInterrupt(); 
 }
 
 void latch(void) {
@@ -51,9 +54,9 @@ void clock_pulse(void) {
 volatile int cnt = 0;
 void controller_int_handler(unsigned pc) {
 	cnt++;
-	// printf("Controller Interrupt!\n");
-	scheduleInterrupt();
+	printf("Controller Interrupt!, %d\n", cnt);
 	clearTimerInterrupt();
+	scheduleInterrupt();
 }
 
 int getCount() {
