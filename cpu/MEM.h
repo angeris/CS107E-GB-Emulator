@@ -2,6 +2,7 @@
 #define MEM_H
 
 #include <stdint.h>
+#include "printf.h"
 
 /* 
  *         Layout of memory (taken from Pan Docs)
@@ -36,7 +37,7 @@ typedef int8_t   gb_short_s;
 // Memory map
 extern gb_short GB_ROM[ROM_SIZE]; // To be read from a given .h file.
 gb_short *_gb_ram;
-gb_short _vram[VRAM_SIZE];
+gb_short vram[VRAM_SIZE];
 gb_short _gb_mem[MEM_SIZE];
 gb_short _gb_hram[MEM_SIZE];
 gb_short _gb_oam[OAM_SIZE];
