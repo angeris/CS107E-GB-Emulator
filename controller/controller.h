@@ -1,6 +1,7 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
+
 typedef struct {
 	unsigned int B : 1;
 	unsigned int Y : 1;
@@ -20,5 +21,9 @@ void controller_init(void);
 void latch(void);
 void clock_pulse(void);
 controller_state getState(void);
+void controller_int_handler(unsigned pc);
+void printtest(void);
+void co_printtime(void);
+int getCount();
 
 #endif
