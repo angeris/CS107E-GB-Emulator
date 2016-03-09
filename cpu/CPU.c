@@ -599,7 +599,7 @@ void exec_op(gb_short op_code) {
 		ram_write8( HL(), L() );
 		break;
     case 0x76:
-		//halt
+		//halt <- should probably have a halt flag that waits until the next interrupt
 		break;
     case 0x77:
 		ram_write8( HL(), A() );
