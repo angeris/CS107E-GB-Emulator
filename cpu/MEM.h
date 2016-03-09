@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /* 
- *         Layout of memory (from Pan Docs)
+ *         Layout of memory (taken from Pan Docs)
  * ----------------------------------------------
  * 0000-3FFF   16KB ROM Bank 00     (in cartridge, fixed at bank 00)
  * 4000-7FFF   16KB ROM Bank 01..NN (in cartridge, switchable bank number)
@@ -24,6 +24,8 @@
 #define ROM_SIZE  -1 // You won't be able to compile until after the H file for the rom is copied!
 #define VRAM_SIZE 8192
 #define MEM_SIZE  0x10000 // 0x0000 - 0xFFFF
+#define OAM_SIZE  160 // 0xFE00 - 0xFEA0
+#define HRAM_SIZE 127 // 0xFF80 - 0xFFFE
 
 // Units of work
 typedef uint16_t gb_long;
@@ -36,6 +38,8 @@ extern gb_short GB_ROM[ROM_SIZE]; // To be read from a given .h file.
 gb_short *_gb_ram;
 gb_short _vram[VRAM_SIZE];
 gb_short _gb_mem[MEM_SIZE];
+gb_short _gb_hram[MEM_SIZE];
+gb_short _gb_oam[OAM_SIZE];
 
 // Other definitions
 gb_short   read8(gb_long addr);
