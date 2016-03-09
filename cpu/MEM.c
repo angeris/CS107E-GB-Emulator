@@ -4,6 +4,7 @@ static unsigned _mbc;
 static unsigned _rom_bank;
 static unsigned _ram_bank;
 static unsigned _ram_enabled;
+static unsigned _ime_enabled;
 
 void init() {
     // Allocate _gb_ram according to cartridge specs 
@@ -64,3 +65,6 @@ void write8(gb_long addr, gb_short val) {
 }
 
 void write16(gb_long addr, gb_long val) { *(_gb_long)(&GB_ROM[addr]) = val; }
+
+void setIME(unsigned flag) { _ime_enabled = !!flag; }
+void getIME() { return flag; }
