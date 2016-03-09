@@ -128,8 +128,8 @@ gb_short isCarr() { return !!(F_CARR & _cpr.F); }
 static gb_short inc8(gb_short reg) {
     reg++;
     setzero(!reg);
-    issubs(0);
-    ishalf(!(reg & 0xf));
+    setSubs(0);
+    setHalf(!(reg & 0xf));
     return reg;
 }
 static gb_long inc16(gb_long reg) {
@@ -138,8 +138,8 @@ static gb_long inc16(gb_long reg) {
 static gb_short dec8(gb_short reg) {
     reg--;
     setzero(!reg);
-    issubs(1);
-    ishalf(!(reg & 0xf));
+    setSubs(1);
+    setHalf(!(reg & 0xf));
     return reg;
 }
 static gb_long dec16(gb_long reg) {
@@ -208,6 +208,27 @@ static gb_long add16(gb_long a, gb_long b) {
     return (gb_long)f;
 }
 
+static gb_short add8(gb_short val) {
+	gb_short a = A();
+	unsigned f = (unsigned)a + (unsigned)val;
+	
+	setSubs(0);
+	setCarr(f > 0xFF);
+	setHalf((a&0xF) + (b&0xF) > 0xF);
+	setZero(f == 0);
+	return (gb_short)f;
+}
+
+static gb_short subtract8(gb_short val) {
+	gb_short a = A();
+	unsigned f = (unsigned)a - (unsigned)val;
+	setSubs(1);
+	setCarr((gb_short)f > a);
+	setHalf((a&0xF) < (val&0xF));
+	setZero(f == 0);
+	return (gb_short)f;
+}
+
 // CPU operations
 void exec_op(gb_short op_code) {
     switch(op_code) {
@@ -241,7 +262,7 @@ void exec_op(gb_short op_code) {
       setHL( add16(HL(), BC()) );
       break; 
     case 0x0A:
-      setA( read16(BC()) );
+      setA( read8(BC()) );
       break;
     case 0x0B:
       setBC( dec16( BC() ) );
@@ -266,7 +287,7 @@ void exec_op(gb_short op_code) {
       setDE(cpu_read16()); 
       break;
     case 0x12:
-      ram_write8((DE), A());
+      ram_write8(DE(), A());
       break;
     case 0x13:
       setDE( inc16( DE() ) );
@@ -289,7 +310,7 @@ void exec_op(gb_short op_code) {
       setHL( add16(HL(), DE()) );
       break;
     case 0x1A:
-      setA( read16(DE()) );
+      setA( read8(DE()) );
       break;
     case 0x1B:
       setDE( dec16( DE() ) );
@@ -339,7 +360,7 @@ void exec_op(gb_short op_code) {
       setHL( add16(HL(), HL()) );
       break;
     case 0x2A:
-      setA( read16(HL()) );
+      setA( read8(HL()) );
 	  setHL( inc16(HL() ) );
       break;
     case 0x2B:
@@ -390,7 +411,7 @@ void exec_op(gb_short op_code) {
       setHL( add16(HL(), SP()) );
       break;
     case 0x3A:
-      setA( read16(HL()) );
+      setA( read8(HL()) );
 	  setHL( dec16(HL() ) );
       break;
     case 0x3B:
@@ -429,7 +450,7 @@ void exec_op(gb_short op_code) {
 		setB( L() );
 		break;
     case 0x46:
-		setB( read16( HL() ) );
+		setB( read8( HL() ) );
 		break;
     case 0x47:
 		setB( A() );
@@ -453,7 +474,7 @@ void exec_op(gb_short op_code) {
 		setC( L() );
 		break;
     case 0x4E:
-		setC( read16( HL() ) );
+		setC( read8( HL() ) );
 		break;
     case 0x4F:
 		setC( A() );
@@ -478,7 +499,7 @@ void exec_op(gb_short op_code) {
 		setD( L() );
 		break;
     case 0x56:
-		setD( read16( HL() ) );
+		setD( read8( HL() ) );
 		break;
     case 0x57:
 		setD( A() );
@@ -502,7 +523,7 @@ void exec_op(gb_short op_code) {
 		setE( L() );
 		break;
     case 0x5E:
-		setE( read16( HL() ) );
+		setE( read8( HL() ) );
 		break;
     case 0x5F:
 		setE( A() );
@@ -528,7 +549,7 @@ void exec_op(gb_short op_code) {
 		setH( L() );
 		break;
     case 0x66:
-		setH( read16( HL() ) );
+		setH( read8( HL() ) );
 		break;
     case 0x67:
 		setH( A() );
@@ -552,7 +573,7 @@ void exec_op(gb_short op_code) {
 		setL( L() );
 		break;
     case 0x6E:
-		setL( read16( HL() ) );
+		setL( read8( HL() ) );
 		break;
     case 0x6F:
 		setL( A() );
@@ -560,28 +581,28 @@ void exec_op(gb_short op_code) {
 	
 	
 	case 0x70:
-		ram_write16( HL(), B() );
+		ram_write8( HL(), B() );
 		break;
     case 0x71:
-		ram_write16( HL(), C() );
+		ram_write8( HL(), C() );
 		break;
     case 0x72:
-		ram_write16( HL(), D() );
+		ram_write8( HL(), D() );
 		break;
     case 0x73:
-		ram_write16( HL(), E() );
+		ram_write8( HL(), E() );
 		break;
 	case 0x74:
-		ram_write16( HL(), H() );
+		ram_write8( HL(), H() );
 		break;
     case 0x75:
-		ram_write16( HL(), L() );
+		ram_write8( HL(), L() );
 		break;
     case 0x76:
 		//halt
 		break;
     case 0x77:
-		ram_write16( HL(), A() );
+		ram_write8( HL(), A() );
 		break;
     case 0x78:
 		setA( B() );
@@ -602,11 +623,113 @@ void exec_op(gb_short op_code) {
 		setA( L() );
 		break;
     case 0x7E:
-		setA( read16( HL() ) );
+		setA( read8( HL() ) );
 		break;
     case 0x7F:
 		setA( A() );
 		break;
+		
+		
+	case 0x80:
+		setA( A() + B() );
+		break;
+    case 0x81:
+		setA( A() + C() );
+		break;
+    case 0x82:
+		setA( A() + D() );
+		break;
+    case 0x83:
+		setA( A() + E() );
+		break;
+	case 0x84:
+		setA( A() + H() );
+		break;
+    case 0x85:
+		setA( A() + L() );
+		break;
+    case 0x86:
+		setA( A() + read8( HL() ) );
+		break;
+    case 0x87:
+		setA( A() + A() );
+		break;
+    case 0x88:
+		setA( A() + B() + isCarr() );
+		break;
+    case 0x89:
+		setA( A() + C() + isCarr() );
+		break;
+    case 0x8A:
+		setA( A() + D() + isCarr() );
+		break;
+    case 0x8B:
+		setA( A() + E() + isCarr() );
+		break;
+	case 0x8C:
+		setA( A() + H() + isCarr() );
+		break;
+    case 0x8D:
+		setA( A() + L() + isCarr() );
+		break;
+    case 0x8E:
+		setA( A() + read8( HL() ) + isCarr() );
+		break;
+    case 0x8F:
+		setA( A() + A() + isCarr() );
+		break;
+		
+		
+	case 0x90:
+		setA( A() - B() );
+		break;
+    case 0x91:
+		setA( A() - C() );
+		break;
+    case 0x92:
+		setA( A() - D() );
+		break;
+    case 0x93:
+		setA( A() - E() );
+		break;
+	case 0x94:
+		setA( A() - H() );
+		break;
+    case 0x95:
+		setA( A() - L() );
+		break;
+    case 0x96:
+		setA( A() - read8( HL() ) );
+		break;
+    case 0x97:
+		setA( A() - A() );
+		break;
+    case 0x98:
+		setA( A() - B() - isCarr() );
+		break;
+    case 0x99:
+		setA( A() - C() - isCarr() );
+		break;
+    case 0x9A:
+		setA( A() - D() - isCarr() );
+		break;
+    case 0x9B:
+		setA( A() - E() - isCarr() );
+		break;
+	case 0x9C:
+		setA( A() - H() - isCarr() );
+		break;
+    case 0x9D:
+		setA( A() - L() - isCarr() );
+		break;
+    case 0x9E:
+		setA( A() - read8( HL() ) - isCarr() );
+		break;
+    case 0x9F:
+		setA( A() - A() - isCarr() );
+		break;
+		
+		
     }
 
 }
