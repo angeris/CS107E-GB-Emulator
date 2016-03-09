@@ -1,5 +1,6 @@
 #include "printf.h"
 #include "CPU.h"
+#include "Mem.h"
 
 struct {
     gb_short A;
@@ -51,6 +52,8 @@ gb_long read16(gb_long addr) {
     return (gb_long)(_gb_rom[addr]) << 8 | (gb_long)(_gb_rom[addr+1]);
 }
 
+//should be left shifts?
+
 // long register read/write
 static inline void setBC(gb_long l) {
     _cpr.B = (gb_short)(l>>8);
@@ -91,6 +94,7 @@ static inline void setE(gb_short a) { _cpr.E = a; }
 static inline void setH(gb_short a) { _cpr.H = a; }
 static inline void setL(gb_short a) { _cpr.L = a; }
 static inline void setSP(gb_long a) { _cpr.SP = a; }
+static inline void setPC(gb_long a) { _cpr.PC = a; }
 
 // Flags
 void setZero(gb_short i) {
@@ -182,6 +186,20 @@ static gb_short rot8_l_carry(gb_short reg) {
     return reg;
 }
 
+static void jump_relative() {
+	setPC(_cpr.PC + read8s(_cpr.PC) + 1));
+	
+}
+
+static void jump_relative_with_cond(int cond) {
+	if (cond) {
+		jump_relative();
+	}
+	else {
+		_cpr.PC++;
+	}	
+}
+
 static gb_long add16(gb_long a, gb_long b) {
     unsigned f = (unsigned)a + (unsigned)b;
     setSubs(0);
@@ -240,6 +258,8 @@ void exec_op(gb_short op_code) {
     case 0x0F:
       setA( rot8_r( A() ) );
       break;
+	  
+	  
     case 0x10:
       break;
     case 0x11:
@@ -263,7 +283,7 @@ void exec_op(gb_short op_code) {
       setA( rot8_l_carry( A() ) );
       break;
     case 0x18:
-      setPC( _cpr.PC + read8s(_cpr.PC) + 1);
+      jump_relative();
       break;
     case 0x19:
       setHL( add16(HL(), DE()) );
@@ -284,11 +304,162 @@ void exec_op(gb_short op_code) {
       setE( cpu_read8());
       break;
     case 0x1F:
-      setA(rot8_r_carry(A()));
+		setA(rot8_r_carry(A()));
       break;
-      
+	  
+	  
+	case 0x20:
+		jump_relative_with_cond(!isZero());
+		break;
+    case 0x21:
+	  setHL(cpu_read16()); 
+      break;
+    case 0x22:
+      ram_write8((HL), A());
+	  setHL( inc16( HL() ) );
+      break;
+    case 0x23:
+      setHL( inc16( HL() ) );
+    case 0x24:
+      setH( inc8( H() ) );
+      break;
+    case 0x25:
+      setH( dec8( H() ) );
+      break;
+    case 0x26:
+      setH(cpu_read8());
+      break;
+    case 0x27:
+      //DAA();
+      break;
+    case 0x28:
+      jump_relative_with_cond(isZero());
+      break;
+    case 0x29:
+      setHL( add16(HL(), HL()) );
+      break;
+    case 0x2A:
+      setA( read16(HL()) );
+	  setHL( inc16(HL() ) );
+      break;
+    case 0x2B:
+      setHL( dec16( HL() ) );
+      break;
+    case 0x2C:
+      setL( inc8( L() ) );
+      break;
+    case 0x2D:
+      setL( dec8( L() ) );
+      break;
+    case 0x2E:
+      setL( cpu_read8());
+      break;
+    case 0x2F:
+      //CPL()
+      break;
+	
+	
+	case 0x30:
+		jump_relative_with_cond(!isCarr());
+      break;
+    case 0x31:
+	  setSP(cpu_read16()); 
+      break;
+    case 0x32:
+      ram_write8(HL(), A());
+	  setHL( dec16( HL() ) );
+      break;
+    case 0x33:
+      setSP( inc16( SP() ) );
+    case 0x34:
+      ram_write16(HL(), inc16( cpu_read16( HL() ) ) );
+      break;
+    case 0x35:
+      ram_write16(HL(), dec16( cpu_read16( HL() ) ) );
+      break;
+    case 0x36:
+      ram_write16(HL(), cpu_read8());
+      break;
+    case 0x37:
+      //SCF();
+      breaK;
+    case 0x38:
+      jump_relative_with_cond(isCarr());
+      break;
+    case 0x39:
+      setHL( add16(HL(), SP()) );
+      break;
+    case 0x3A:
+      setA( read16(HL()) );
+	  setHL( dec16(HL() ) );
+      break;
+    case 0x3B:
+      setSP( dec16( SP() ) );
+      break;
+    case 0x3C:
+      setA( inc8( A() ) );
+      break;
+    case 0x3D:
+      setA( dec8( A() ) );
+      break;
+    case 0x3E:
+      setA( cpu_read8());
+      break;
+    case 0x3F:
+      //CCF()
+      break;
+	
 
-	     
+	case 0x40:
+		
+      break;
+    case 0x31:
+	  setSP(cpu_read16()); 
+      break;
+    case 0x32:
+      ram_write8(HL(), A());
+	  setHL( dec16( HL() ) );
+      break;
+    case 0x33:
+      setSP( inc16( SP() ) );
+    case 0x34:
+      ram_write16(HL(), inc16( cpu_read16( HL() ) ) );
+      break;
+    case 0x35:
+      ram_write16(HL(), dec16( cpu_read16( HL() ) ) );
+      break;
+    case 0x36:
+      ram_write16(HL(), cpu_read8());
+      break;
+    case 0x37:
+      //SCF();
+      breaK;
+    case 0x38:
+      jump_relative_with_cond(isCarr());
+      break;
+    case 0x39:
+      setHL( add16(HL(), SP()) );
+      break;
+    case 0x3A:
+      setA( read16(HL()) );
+	  setHL( dec16(HL() ) );
+      break;
+    case 0x3B:
+      setSP( dec16( SP() ) );
+      break;
+    case 0x3C:
+      setA( inc8( A() ) );
+      break;
+    case 0x3D:
+      setA( dec8( A() ) );
+      break;
+    case 0x3E:
+      setA( cpu_read8());
+      break;
+    case 0x3F:
+      //CCF()
+      break;
+	
     }
 
 }
