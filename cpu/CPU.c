@@ -411,55 +411,202 @@ void exec_op(gb_short op_code) {
 	
 
 	case 0x40:
-		
-      break;
-    case 0x31:
-	  setSP(cpu_read16()); 
-      break;
-    case 0x32:
-      ram_write8(HL(), A());
-	  setHL( dec16( HL() ) );
-      break;
-    case 0x33:
-      setSP( inc16( SP() ) );
-    case 0x34:
-      ram_write16(HL(), inc16( cpu_read16( HL() ) ) );
-      break;
-    case 0x35:
-      ram_write16(HL(), dec16( cpu_read16( HL() ) ) );
-      break;
-    case 0x36:
-      ram_write16(HL(), cpu_read8());
-      break;
-    case 0x37:
-      //SCF();
-      breaK;
-    case 0x38:
-      jump_relative_with_cond(isCarr());
-      break;
-    case 0x39:
-      setHL( add16(HL(), SP()) );
-      break;
-    case 0x3A:
-      setA( read16(HL()) );
-	  setHL( dec16(HL() ) );
-      break;
-    case 0x3B:
-      setSP( dec16( SP() ) );
-      break;
-    case 0x3C:
-      setA( inc8( A() ) );
-      break;
-    case 0x3D:
-      setA( dec8( A() ) );
-      break;
-    case 0x3E:
-      setA( cpu_read8());
-      break;
-    case 0x3F:
-      //CCF()
-      break;
+		setB( B() );
+		break;
+    case 0x41:
+		setB( C() );
+		break;
+    case 0x42:
+		setB( D() );
+		break;
+    case 0x43:
+		setB( E() );
+		break;
+	case 0x44:
+		setB( H() );
+		break;
+    case 0x45:
+		setB( L() );
+		break;
+    case 0x46:
+		setB( read16( HL() ) );
+		break;
+    case 0x47:
+		setB( A() );
+		break;
+    case 0x48:
+		setC( B() );
+		break;
+    case 0x49:
+		setC( C() );
+		break;
+    case 0x4A:
+		setC( D() );
+		break;
+    case 0x4B:
+		setC( E() );
+		break;
+    case 0x4C:
+		setC( H() );
+		break;
+	case 0x4D:
+		setC( L() );
+		break;
+    case 0x4E:
+		setC( read16( HL() ) );
+		break;
+    case 0x4F:
+		setC( A() );
+		break;
 	
+	case 0x50:
+		setD( B() );
+		break;
+    case 0x51:
+		setD( C() );
+		break;
+    case 0x52:
+		setD( D() );
+		break;
+    case 0x53:
+		setD( E() );
+		break;
+	case 0x54:
+		setD( H() );
+		break;
+    case 0x55:
+		setD( L() );
+		break;
+    case 0x56:
+		setD( read16( HL() ) );
+		break;
+    case 0x57:
+		setD( A() );
+		break;
+    case 0x58:
+		setE( B() );
+		break;
+    case 0x59:
+		setE( C() );
+		break;
+    case 0x5A:
+		setE( D() );
+		break;
+    case 0x5B:
+		setE( E() );
+		break;
+    case 0x5C:
+		setE( H() );
+		break;
+	case 0x5D:
+		setE( L() );
+		break;
+    case 0x5E:
+		setE( read16( HL() ) );
+		break;
+    case 0x5F:
+		setE( A() );
+		break;
+		
+		
+	case 0x60:
+		setH( B() );
+		break;
+    case 0x61:
+		setH( C() );
+		break;
+    case 0x62:
+		setH( D() );
+		break;
+    case 0x63:
+		setH( E() );
+		break;
+	case 0x64:
+		setH( H() );
+		break;
+    case 0x65:
+		setH( L() );
+		break;
+    case 0x66:
+		setH( read16( HL() ) );
+		break;
+    case 0x67:
+		setH( A() );
+		break;
+    case 0x68:
+		setL( B() );
+		break;
+    case 0x69:
+		setL( C() );
+		break;
+    case 0x6A:
+		setL( D() );
+		break;
+    case 0x6B:
+		setL( E() );
+		break;
+    case 0x6C:
+		setL( H() );
+		break;
+	case 0x6D:
+		setL( L() );
+		break;
+    case 0x6E:
+		setL( read16( HL() ) );
+		break;
+    case 0x6F:
+		setL( A() );
+		break;
+	
+	
+	case 0x70:
+		ram_write16( HL(), B() );
+		break;
+    case 0x71:
+		ram_write16( HL(), C() );
+		break;
+    case 0x72:
+		ram_write16( HL(), D() );
+		break;
+    case 0x73:
+		ram_write16( HL(), E() );
+		break;
+	case 0x74:
+		ram_write16( HL(), H() );
+		break;
+    case 0x75:
+		ram_write16( HL(), L() );
+		break;
+    case 0x76:
+		//halt
+		break;
+    case 0x77:
+		ram_write16( HL(), A() );
+		break;
+    case 0x78:
+		setA( B() );
+		break;
+    case 0x79:
+		setA( C() );
+		break;
+    case 0x7A:
+		setA( D() );
+		break;
+    case 0x7B:
+		setA( E() );
+		break;
+    case 0x7C:
+		setA( H() );
+		break;
+	case 0x7D:
+		setA( L() );
+		break;
+    case 0x7E:
+		setA( read16( HL() ) );
+		break;
+    case 0x7F:
+		setA( A() );
+		break;
     }
 
 }
