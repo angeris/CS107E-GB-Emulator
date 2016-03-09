@@ -18,7 +18,7 @@ void gpu_exec() {
 
             if(_gpu_line>=143) {
                 _gpu_mode = MODE_VBLANK;
-                //TODO: draw everything into screen
+                gpu_drawscreen();
                 return;
             }
             _gpu_mode = MODE_READOM;   
@@ -27,6 +27,7 @@ void gpu_exec() {
     case MODE_VBLANK:
         if(_gpu_clock >= 4560) {
             _gpu_mode = MODE_READOM;
+            _gpu_line = 0;
             _gpu_clock = 0;
         }
         break;
@@ -50,4 +51,8 @@ void gpu_exec() {
 
 void gpu_writeline() {
     //TODO: A crapload of work
+}
+
+void gpu_drawscreen() {
+    //TODO: Draw everything into the framebuffer; probably just swap the buffer out
 }

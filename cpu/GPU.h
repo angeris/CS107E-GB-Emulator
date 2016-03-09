@@ -20,5 +20,8 @@
 extern gb_short vram[VRAM_SIZE];
 
 gb_short gpu_read(gb_long addr); 
+void gpu_exec();
+void gpu_writeline();
+void gpu_drawscreen();
 
 #endif
