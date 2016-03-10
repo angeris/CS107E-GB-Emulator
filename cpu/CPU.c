@@ -19,7 +19,11 @@ struct {
 
 
 void init_cpu() {
-    // TODO: get the correct init codes.
+    setAF(0x01B0);
+    setBC(0x0013);
+    setDE(0x00D8);
+    setHL(0x014D);
+    setSP(0xFFFE);
 }
 
 // Mem access
@@ -28,7 +32,6 @@ gb_short cpu_read8() {
 }
 
 
-// TODO: Fix this. Should read gb_long
 gb_long cpu_read16() {
     gb_long t = read16(_cpr.PC);
 	_cpr.PC += 2;
