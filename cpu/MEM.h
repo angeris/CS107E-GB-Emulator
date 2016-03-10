@@ -37,7 +37,7 @@ typedef uint8_t  gb_short;
 typedef int8_t   gb_short_s;
 
 // Memory map
-extern gb_short GB_ROM[ROM_SIZE]; // To be read from a given .h file.
+//extern gb_short GB_ROM[ROM_SIZE]; // To be read from a given .h file.
 gb_short *_gb_ram;
 gb_short vram[VRAM_SIZE];
 gb_short _gb_mem[MEM_SIZE];

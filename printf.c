@@ -178,3 +178,18 @@ int vsnprintf(char *s, int n, const char *format, va_list v_list) {
     return 0;
 }
 
+int printf(char *format, ...) {
+    char buf[256];
+    char *p = buf;
+    va_list v_list;
+    va_start(v_list, format);
+
+    int ret = vsnprintf(buf, 256, format, v_list); 
+
+    while(*p != '\0') uart_putc(*(p++));
+
+    uart_flush();
+
+    return ret;
+}
+

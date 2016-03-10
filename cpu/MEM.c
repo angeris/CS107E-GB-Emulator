@@ -21,14 +21,14 @@ gb_short read8(gb_long addr) {
         if(_mbc == 0)
             return GB_ROM[addr];
         else
-            return GB_ROM[addr - 0x4000 + _rom_bank << 14]; // multiply by 0x4000
+            return GB_ROM[addr - 0x4000 + (_rom_bank << 14)]; // multiply by 0x4000
     }
     if(addr >= 0x8000 && addr < 0xA000)
         return vram[addr - 0x8000];
 
     if(addr >= 0xA000 && addr < 0xC000) {
         if(_mbc != 0) 
-            return _gb_ram[addr - 0xA000 + _ram_bank << 13]; // multiply by 0x2000
+            return _gb_ram[addr - 0xA000 + (_ram_bank << 13)]; // multiply by 0x2000
         else
             return _gb_ram[addr - 0xA000];
     }
@@ -45,12 +45,13 @@ gb_short read8(gb_long addr) {
     if(addr == 0xFFFF)
         return _ime_enabled;
 
-    printf("Something is accessing wrong memory at : 0x%04x (READ)", gb_long);
+    printf("Something is accessing wrong memory at : 0x%04x (READ)", addr);
     return _gb_mem[addr];
 }
 
 gb_short_s read8s(gb_long addr) {
-    return *(gb_short_s*)(&read8(addr));
+    gb_short _temp = read8(addr);
+    return *(gb_short_s*)(&_temp);
 }
 
 gb_long read16(gb_long addr) {
@@ -70,7 +71,7 @@ void write8(gb_long addr, gb_short val) {
     else if(addr >= 0x8000 && addr < 0xA000)
         vram[addr - 0x8000] = val;
     else if(addr >= 0xA000 && addr < 0xC000 && _ram_enabled) { 
-        if(_mbc) _gb_ram[addr - 0xA000 + _ram_bank << 13] = val;
+        if(_mbc) _gb_ram[addr - 0xA000 + (_ram_bank << 13)] = val;
         else _gb_ram[addr - 0xA000] = val;
     }
     else if(addr >= 0xC000 && addr < 0xE000) {
@@ -91,7 +92,10 @@ void write8(gb_long addr, gb_short val) {
         _gb_mem[addr] = val;
 }
 
-void write16(gb_long addr, gb_long val) { *(_gb_long)(&GB_ROM[addr]) = val; }
+void write16(gb_long addr, gb_long val) { 
+    write8(addr, (gb_short)val);
+    write8(addr+1, (gb_short)(val>>8));
+}
 
 void setIME(unsigned flag) { _ime_enabled = !!flag; }
-void getIME() { return flag; }
+gb_long getIME() { return _ime_enabled; }

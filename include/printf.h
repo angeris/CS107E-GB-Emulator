@@ -2,6 +2,7 @@
 #define PRINTF_DEFS
 
 #include <stdarg.h>
+#include "uart.h"
 
 #define F_DEC 'd'
 #define F_HEX 'x'
