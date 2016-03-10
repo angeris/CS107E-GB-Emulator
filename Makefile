@@ -18,7 +18,7 @@ LDLIBS = -lpi -lgcc
 NAME = main
 CONTROLLER = main_controller
 
-C_SRCS = $(NAME).c cstart.c malloc.c printf.c gl.c fb.c cpu/CPU.c cpu/MEM.c 
+C_SRCS = $(NAME).c cstart.c malloc.c printf.c gl.c fb.c cpu/CPU.c cpu/MEM.c roms/cpu_instrs.c
 S_SRCS = start.s
 
 ROMS = Pokemon_Red.gb Tetris.gb

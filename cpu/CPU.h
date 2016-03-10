@@ -3,6 +3,7 @@
 
 #include "printf.h"
 #include "MEM.h"
+#include "DATA_TYPES.h"
 
 void init_cpu();
 void cpu_step();

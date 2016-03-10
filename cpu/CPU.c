@@ -1,6 +1,4 @@
-#include "printf.h"
 #include "CPU.h"
-#include "MEM.h"
 
 struct {
     gb_short A;

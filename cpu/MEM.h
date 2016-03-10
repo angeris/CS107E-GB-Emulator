@@ -1,10 +1,10 @@
 #ifndef MEM_H
 #define MEM_H
 
-#include <stdint.h>
 #include "printf.h"
 #include "malloc.h"
 #include "cpu_instrs.h"
+#include "DATA_TYPES.h"
 
 /* 
  *         Layout of memory (taken from Pan Docs)
@@ -29,12 +29,6 @@
 #define MEM_SIZE  0x10000 // 0x0000 - 0xFFFF
 #define OAM_SIZE  160 // 0xFE00 - 0xFEA0
 #define HRAM_SIZE 127 // 0xFF80 - 0xFFFE
-
-// Units of work
-typedef uint16_t gb_long;
-typedef int16_t  gb_long_s;
-typedef uint8_t  gb_short;
-typedef int8_t   gb_short_s;
 
 // Memory map
 //extern gb_short GB_ROM[ROM_SIZE]; // To be read from a given .h file.
