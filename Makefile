@@ -23,7 +23,7 @@ S_SRCS = start.s
 
 ROMS = Pokemon_Red.gb Tetris.gb
 
-CONTROLLER_SRCS = $(CONTROLLER).c cstart.c malloc.c printf.c gl.c fb.c controller/controller.c controller/interrupt.c
+CONTROLLER_SRCS = $(CONTROLLER).c cstart.c malloc.c printf.c gl.c fb.c interrupt.c controller/controller.c 
 
 all : $(NAME).bin
 
