@@ -58,6 +58,7 @@ void init_cpu() {
     setDE(0x00D8);
     setHL(0x014D);
     setSP(0xFFFE);
+    setPC(0x0150);
 }
 
 
