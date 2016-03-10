@@ -6,6 +6,7 @@
 
 void init_cpu();
 void cpu_step();
+void exec_op(gb_short op_code); 
 
 // Mem access
 gb_short cpu_read8();
