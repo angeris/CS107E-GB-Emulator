@@ -70,8 +70,9 @@ install: $(NAME).bin
 #	xxd -i roms/$< > roms/$@
 
 # Should definitely generalize this to dump all files in the rom directory
-rom_build:
+rom_dump:
 	xxd -i roms/Pokemon_Red.gb > roms/Pokemon_Red.h
+	xxd -i roms/cpu_instrs.gb > roms/cpu_instrs.h
 
 .PHONY: all clean
 
