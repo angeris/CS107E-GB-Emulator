@@ -1,6 +1,6 @@
 #include "printf.h"
 #include "CPU.h"
-#include "Mem.h"
+#include "MEM.h"
 
 struct {
     gb_short A;
@@ -17,14 +17,6 @@ struct {
 
 } _cpr;
 
-
-void init_cpu() {
-    setAF(0x01B0);
-    setBC(0x0013);
-    setDE(0x00D8);
-    setHL(0x014D);
-    setSP(0xFFFE);
-}
 
 // Mem access
 gb_short cpu_read8() {
@@ -44,6 +36,11 @@ static inline void setBC(gb_long l) {
     _cpr.C = (gb_short)(l&0xFF);
 }
 
+static inline void setAF(gb_long l) {
+  _cpr.A = (gb_short)(l>>8);
+  _cpr.F = (gb_short)(l&0xFF);
+}
+
 static inline void setDE(gb_long l) {
     _cpr.D = (gb_short)(l>>8);
     _cpr.E = (gb_short)(l&0xFF);
@@ -53,6 +50,16 @@ static inline void setHL(gb_long l) {
     _cpr.H = (gb_short)(l>>8);
     _cpr.L = (gb_short)(l&0xFF);
 }
+
+
+void init_cpu() {
+    setAF(0x01B0);
+    setBC(0x0013);
+    setDE(0x00D8);
+    setHL(0x014D);
+    setSP(0xFFFE);
+}
+
 
 // Read helpers (for clarity)
 // TODO: Cast to gb_longs before shifts.

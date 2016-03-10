@@ -8,7 +8,7 @@ void init_cpu();
 
 // Mem access
 gb_short cpu_read8();
-gb_short cpu_read16();
+gb_long cpu_read16();
 
 // Flags:
 
