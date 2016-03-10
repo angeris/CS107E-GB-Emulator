@@ -72,7 +72,6 @@ void init_cpu() {
     setPC(0x0150);
 }
 
-
 // Read helpers (for clarity)
 // TODO: Cast to gb_longs before shifts.
 static inline gb_short A() { return _cpr.A; }
@@ -85,6 +84,7 @@ static inline gb_short H() { return _cpr.H; }
 static inline gb_short L() { return _cpr.L; }
 static inline gb_long SP() { return _cpr.SP; }
 static inline gb_long PC() { return _cpr.PC; }
+static inline gb_long AF() { return (gb_long)_cpr.A << 8 | (gb_long)_cpr.F; }
 static inline gb_long BC() { return (gb_long)_cpr.B << 8 | (gb_long)_cpr.C; }
 static inline gb_long DE() { return (gb_long)_cpr.D << 8 | (gb_long)_cpr.E; }
 static inline gb_long HL() { return (gb_long)_cpr.H << 8 | (gb_long)_cpr.L; }

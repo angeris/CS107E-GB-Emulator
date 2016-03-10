@@ -30,5 +30,6 @@ int replace_per(char *buf, int start, int len, unsigned val, int width, char typ
 
 int snprintf(char *s, int n, char *format, ...);
 int vsnprintf(char *s, int n, const char *format, va_list v_list);
+int printf(char *format, ...);
 
 #endif
