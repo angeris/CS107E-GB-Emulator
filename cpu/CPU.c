@@ -24,15 +24,15 @@ void init_cpu() {
 
 // Mem access
 gb_short cpu_read8() {
-    return _gb_rom[_cpr.PC++]; 
+    return read8(_cpr.PC++);
 }
 
 
 // TODO: Fix this. Should read gb_long
 gb_short cpu_read16() {
-    gb_short t = _gb_rom[_cpr.PC];
-    _cpr.PC += 2;
-    return t;
+    gb_long t = read16(_cpr.PC);
+	_cpr.PC += 2;
+	return t;
 }
 
 // TODO: Fix this... not rom.
@@ -44,15 +44,6 @@ void ram_write16(gb_long addr, gb_long s) {
     *(gb_long*)(&_gb_rom[addr]) = s;
 }
 
-gb_short read8(gb_long addr) {
-    return _gb_rom[addr];
-}
-
-gb_long read16(gb_long addr) {
-    return (gb_long)(_gb_rom[addr]) << 8 | (gb_long)(_gb_rom[addr+1]);
-}
-
-//should be left shifts?
 
 // long register read/write
 static inline void setBC(gb_long l) {
@@ -82,9 +73,9 @@ static inline gb_short H() { return _cpr.H; }
 static inline gb_short L() { return _cpr.L; }
 static inline gb_long SP() { return _cpr.SP; }
 static inline gb_long PC() { return _cpr.PC; }
-static inline gb_long BC() { return _cpr.B << 8 | _cpr.C; }
-static inline gb_long DE() { return _cpr.D << 8 | _cpr.E; }
-static inline gb_long HL() { return _cpr.H << 8 | _cpr.L; }
+static inline gb_long BC() { return (gb_long)_cpr.B << 8 | (gb_long)_cpr.C; }
+static inline gb_long DE() { return (gb_long)_cpr.D << 8 | (gb_long)_cpr.E; }
+static inline gb_long HL() { return (gb_long)_cpr.H << 8 | (gb_long)_cpr.L; }
 
 static inline void setA(gb_short a) { _cpr.A = a; }
 static inline void setF(gb_short a) { _cpr.F = a; }
@@ -308,7 +299,7 @@ static void jump() {
 
 static void push(gb_long val) {
 	decSP();
-	ram_write16( SP(), val );
+	write16( SP(), val );
 }
 
 static void call() {
@@ -332,7 +323,7 @@ void exec_op(gb_short op_code) {
       setBC(cpu_read16()); 
       break;
     case 0x02:
-      ram_write8(BC(), A());
+      write8(BC(), A());
       break;
     case 0x03:
       setBC( inc16( BC() ) );
@@ -350,7 +341,7 @@ void exec_op(gb_short op_code) {
       setA( rot8_l( A() ) );
       break;
     case 0x08:
-      ram_write16(cpu_read16(), SP());
+      write16(cpu_read16(), SP());
       break;
     case 0x09:
       setHL( add16(HL(), BC()) );
@@ -381,7 +372,7 @@ void exec_op(gb_short op_code) {
       setDE(cpu_read16()); 
       break;
     case 0x12:
-      ram_write8(DE(), A());
+      write8(DE(), A());
       break;
     case 0x13:
       setDE( inc16( DE() ) );
@@ -430,7 +421,7 @@ void exec_op(gb_short op_code) {
 	  setHL(cpu_read16()); 
       break;
     case 0x22:
-      ram_write8((HL), A());
+      write8((HL), A());
 	  setHL( inc16( HL() ) );
       break;
     case 0x23:
@@ -481,19 +472,19 @@ void exec_op(gb_short op_code) {
 	  setSP(cpu_read16()); 
       break;
     case 0x32:
-      ram_write8(HL(), A());
+      write8(HL(), A());
 	  setHL( dec16( HL() ) );
       break;
     case 0x33:
       setSP( inc16( SP() ) );
     case 0x34:
-      ram_write16(HL(), inc16( cpu_read16( HL() ) ) );
+      write16(HL(), inc16( cpu_read16( HL() ) ) );
       break;
     case 0x35:
-      ram_write16(HL(), dec16( cpu_read16( HL() ) ) );
+      write16(HL(), dec16( cpu_read16( HL() ) ) );
       break;
     case 0x36:
-      ram_write16(HL(), cpu_read8());
+      write16(HL(), cpu_read8());
       break;
     case 0x37:
       //SCF();
@@ -675,28 +666,28 @@ void exec_op(gb_short op_code) {
 	
 	
 	case 0x70:
-		ram_write8( HL(), B() );
+		write8( HL(), B() );
 		break;
     case 0x71:
-		ram_write8( HL(), C() );
+		write8( HL(), C() );
 		break;
     case 0x72:
-		ram_write8( HL(), D() );
+		write8( HL(), D() );
 		break;
     case 0x73:
-		ram_write8( HL(), E() );
+		write8( HL(), E() );
 		break;
 	case 0x74:
-		ram_write8( HL(), H() );
+		write8( HL(), H() );
 		break;
     case 0x75:
-		ram_write8( HL(), L() );
+		write8( HL(), L() );
 		break;
     case 0x76:
 		//halt <- should probably have a halt flag that waits until the next interrupt
 		break;
     case 0x77:
-		ram_write8( HL(), A() );
+		write8( HL(), A() );
 		break;
     case 0x78:
 		setA( B() );
@@ -956,7 +947,7 @@ void exec_op(gb_short op_code) {
 		push(BC());
 		break;
     case 0xC6:
-		add8(read8());
+		add8( cpu_read8() );
 		break;
     case 0xC7:
 		reset(0x00);
@@ -992,7 +983,7 @@ void exec_op(gb_short op_code) {
 		call();
 		break;
     case 0xCE:
-		setA( add8( read8() + isCarr() ) );
+		setA( add8( cpu_read8() + isCarr() ) );
 		break;
     case 0xCF:
 		reset(0x08);
@@ -1030,7 +1021,7 @@ void exec_op(gb_short op_code) {
 		push(DE());
 		break;
     case 0xD6:
-		setA( subtract8( read8() ) );
+		setA( subtract8( cpu_read8() ) );
 		break;
     case 0xD7:
 		reset(0x10);
@@ -1065,7 +1056,7 @@ void exec_op(gb_short op_code) {
     case 0xDD:
 		break;
     case 0xDE:
-		setA( subtract8( read8() + isCarr() ) );
+		setA( subtract8( cpu_read8() + isCarr() ) );
 		break;
     case 0xDF:
 		reset(0x18);
@@ -1073,14 +1064,14 @@ void exec_op(gb_short op_code) {
 		
 		
 	case 0xE0:
-		ram_write8(0XFF00 + cpu_read8(), A());
+		write8(0XFF00 + cpu_read8(), A());
 		break;
     case 0xE1:
 		setHL(readSP());
 		incSP();
 		break;
     case 0xE2:
-		ram_write8( C(), A() );
+		write8( C(), A() );
 		break;
     case 0xE3:
 		break;
@@ -1090,7 +1081,7 @@ void exec_op(gb_short op_code) {
 		push(HL());
 		break;
     case 0xE6:
-		setA( and8( read8() ) );
+		setA( and8( cpu_read8() ) );
 		break;
     case 0xE7:
 		reset(0x20);
@@ -1109,7 +1100,7 @@ void exec_op(gb_short op_code) {
 		setPC(read16(HL()));
 		break;
     case 0xEA:
-		ram_write8(cpu_read16(), A());
+		write8(cpu_read16(), A());
 		break;
     case 0xEB:
 		break;
@@ -1118,7 +1109,7 @@ void exec_op(gb_short op_code) {
     case 0xED:
 		break;
     case 0xEE:
-		setA( xor8( read8() ) );
+		setA( xor8( cpu_read8() ) );
 		break;
     case 0xEF:
 		reset(0x28);
