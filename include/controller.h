@@ -22,5 +22,6 @@ void clock_pulse(void);
 controller_state getState(void);
 void controller_int_handler(unsigned pc);
 void printtest(void);
+void update_global_controller_state(void);
 
 #endif

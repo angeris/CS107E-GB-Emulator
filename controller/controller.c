@@ -6,6 +6,9 @@
 #include "interrupt.h"
 #include "proto.h"
 
+/* Global Controller State */
+controller_state gcs;
+
 const unsigned CLOCK = GPIO_PIN23;
 const unsigned DATA = GPIO_PIN24;
 const unsigned LATCH = GPIO_PIN25;
@@ -14,7 +17,6 @@ const unsigned LATCH = GPIO_PIN25;
 #define RPI_INT_ENABLE_2             0x2000B214
 #define RPI_INT_DISABLE_1            0x2000B21C
 #define RPI_INT_DISABLE_2            0x2000B220
-
 
 /**
  * Initializes the controller by first disabling all interrupts,
@@ -70,7 +72,7 @@ void clock_pulse(void) {
 }
 
 void controller_int_handler(unsigned pc) {
-	
+	update_global_controller_state();
 	clear_timer_interrupt_1();
 	schedule_timer_interrupt();
 }
@@ -116,6 +118,10 @@ controller_state getState(void) {
 	cs.R = !gpio_read(DATA);
 
 	return cs;
+}
+
+void update_global_controller_state(void) {
+	gcs = getState();
 }
 
 /* Alternate Timer Interrupt 1 init */

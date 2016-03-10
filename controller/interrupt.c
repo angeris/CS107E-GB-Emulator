@@ -31,7 +31,7 @@ void clear_timer_interrupt_1(void) {
  * pre-defined interrup delay
  */
 void schedule_timer_interrupt(void) {
-	PUT32(C1, *(volatile unsigned int *)CLO + (INTDELAY * 10000));
+	PUT32(C1, *(volatile unsigned int *)CLO + (INTDELAY * 1000));
 }
 
 /* Alternate  clear_timer_interrupt_1 Implementation */
