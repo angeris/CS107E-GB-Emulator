@@ -29,21 +29,11 @@ gb_short cpu_read8() {
 
 
 // TODO: Fix this. Should read gb_long
-gb_short cpu_read16() {
+gb_long cpu_read16() {
     gb_long t = read16(_cpr.PC);
 	_cpr.PC += 2;
 	return t;
 }
-
-// TODO: Fix this... not rom.
-void ram_write8(gb_long addr, gb_short s) {
-    _gb_rom[addr] = s;
-}
-
-void ram_write16(gb_long addr, gb_long s) {
-    *(gb_long*)(&_gb_rom[addr]) = s;
-}
-
 
 // long register read/write
 static inline void setBC(gb_long l) {
