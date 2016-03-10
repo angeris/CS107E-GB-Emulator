@@ -9,7 +9,8 @@ static gb_short _ime_enabled;
 extern gb_short get_joypad_input(); //XXX: Or whatever this is
 
 void init() {
-    // Allocate _gb_ram according to cartridge specs 
+    _gb_ram = (gb_short*)malloc(4096); //Allocate normal RAM for testing
+    //TODO: Allocate _gb_ram according to cartridge specs 
 }
 
 gb_short read8(gb_long addr) {
@@ -24,9 +25,12 @@ gb_short read8(gb_long addr) {
     if(addr >= 0x8000 && addr < 0xA000)
         return vram[addr - 0x8000];
 
-    if(addr >= 0xA000 && addr < 0xC000) 
+    if(addr >= 0xA000 && addr < 0xC000) {
         if(_mbc != 0) 
             return _gb_ram[addr - 0xA000 + _ram_bank << 13]; // multiply by 0x2000
+        else
+            return _gb_ram[addr - 0xA000];
+    }
     if(addr >= 0xC000 && addr < 0xFE00)
         return _gb_mem[addr]; // Not strictly necessary, but nice to be explicit
     if(addr >= 0xFE00 && addr < 0xFEA0) 

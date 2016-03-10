@@ -1,3 +1,5 @@
+#include "MEM.h"
+#include "CPU.h"
 #include "proto.h"
 #include "gpio.h"
 
@@ -11,5 +13,8 @@ void interrupt_vector(unsigned pc) {
 }
 
 void main(void) {
-    while(1) {}
+    init_cpu();
+    while(1) {
+        
+    }
 }

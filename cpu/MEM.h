@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "printf.h"
+#include "malloc.h"
 
 /* 
  *         Layout of memory (taken from Pan Docs)

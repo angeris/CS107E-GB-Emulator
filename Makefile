@@ -15,15 +15,15 @@ LDLIBS = -lpi -lgcc
 
 .SUFFIXES:
 
-NAME = main_cpu
+NAME = main
 CONTROLLER = main_controller
 
-C_SRCS = $(NAME).c cstart.c malloc.c printf.c gl.c fb.c cpu/CPU.c controller/controller.c
+C_SRCS = $(NAME).c cstart.c malloc.c printf.c gl.c fb.c cpu/CPU.c cpu/MEM.c cpu/main-cpu.c controller/controller.c
 S_SRCS = start.s
 
 ROMS = Pokemon_Red.gb Tetris.gb
 
-CONTROLLER_SRCS = $(CONTROLLER).c cstart.c malloc.c printf.c gl.c fb.c controller/controller.c controller/interrupt.c
+CONTROLLER_SRCS = $(CONTROLLER).c cstart.c malloc.c printf.c gl.c fb.c interrupt.c controller/controller.c 
 
 all : $(NAME).bin
 
@@ -70,8 +70,9 @@ install: $(NAME).bin
 #	xxd -i roms/$< > roms/$@
 
 # Should definitely generalize this to dump all files in the rom directory
-rom_build:
+rom_dump:
 	xxd -i roms/Pokemon_Red.gb > roms/Pokemon_Red.h
+	xxd -i roms/cpu_instrs.gb > roms/cpu_instrs.h
 
 .PHONY: all clean
 
