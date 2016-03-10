@@ -54,7 +54,7 @@ gb_short_s read8s(gb_long addr) {
 }
 
 gb_long read16(gb_long addr) {
-    return (gb_long)read8(addr) << 8 | (gb_long)read8(addr+1);
+    return (gb_long)read8(addr+1) << 8 | (gb_long)read8(addr);
 }
 
 void write8(gb_long addr, gb_short val) {

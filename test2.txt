@@ -1,0 +1,11 @@
+Script started on Thu Mar 10 04:01:11 2016
+[?1034h[36mGuille[m@[32mEhWhyNot:[33;1m~/Documents/Stanford/Classes/Winter 2016/CS107E/CS107E-GB-Emulator[m$ ls
+LICENSE           [1m[34mcartridge[39;49m[0m         cstart.c          [1m[34mdocs[39;49m[0m              fb.o              gl.c              [1m[34minclude[39;49m[0m           [1m[32mmain.bin[39;49m[0m          [1m[32mmain.exe[39;49m[0m          main_cpu.c        malloc.o          printf.c          [1m[34mroms[39;49m[0m              test2.txt
+Makefile          [1m[34mcontroller[39;49m[0m        cstart.d          fb.c              gbemu_output2.txt gl.d              interrupt.c       main.c            main.o            malloc.c          memmap            printf.d          start.o
+README.md         [1m[34mcpu[39;49m[0m               cstart.o          fb.d              gbemu_output3.txt gl.o              [1m[34mlib[39;49m[0m               main.d            main_controller.c malloc.d          [1m[34mold_tests[39;49m[0m         printf.o          start.s
+[36mGuille[m@[32mEhWhyNot:[33;1m~/Documents/Stanford/Classes/Winter 2016/CS107E/CS107E-GB-Emulator[m$ ls
+LICENSE           [1m[34mcartridge[39;49m[0m         cstart.c          [1m[34mdocs[39;49m[0m              fb.o              gl.c              [1m[34minclude[39;49m[0m           [1m[32mmain.bin[39;49m[0m          [1m[32mmain.exe[39;49m[0m          main_cpu.c        malloc.o          printf.c          [1m[34mroms[39;49m[0m              test2.txt
+Makefile          [1m[34mcontroller[39;49m[0m        cstart.d          fb.c              gbemu_output2.txt gl.d              interrupt.c       main.c            main.o            malloc.c          memmap            printf.d          start.o
+README.md         [1m[34mcpu[39;49m[0m               cstart.o          fb.d              gbemu_output3.txt gl.o              [1m[34mlib[39;49m[0m               main.d            main_controller.c malloc.d          [1m[34mold_tests[39;49m[0m         printf.o          start.s
+[36mGuille[m@[32mEhWhyNot:[33;1m~/Documents/Stanford/Classes/Winter 2016/CS107E/CS107E-GB-Emulator[m$ 
+[36mGuille[m@[32mEhWhyNot:[33;1m~/Documents/Stanford/Classes/Winter 2016/CS107E/CS107E-GB-Emulator[m$ 

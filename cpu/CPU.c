@@ -1,4 +1,14 @@
 #include "CPU.h"
+#include "proto.h"
+
+static int counter = 0;
+
+static inline gb_long SP(); 
+static inline gb_long PC(); 
+static inline gb_long AF(); 
+static inline gb_long BC(); 
+static inline gb_long DE(); 
+static inline gb_long HL(); 
 
 struct {
     gb_short A;
@@ -16,12 +26,24 @@ struct {
 } _cpr;
 
 void cpu_step() {
+    unsigned _af = AF();
+    unsigned _bc = BC();
+    unsigned _de = DE();
+    unsigned _hl = HL();
+    unsigned _sp = SP();
+    unsigned _pc = PC()+1;
+    unsigned _opcode = read8(PC());
+    
+    printf("AF:0x%04x,BC:0x%04x,DE:0x%04x,HL:0x%04x,SP:0x%04x,PC:0x%04x,OP:0x%02x\n", _af, _bc, _de, _hl, _sp, _pc, _opcode); 
     exec_op(cpu_read8());
 }
 
 // Mem access
 gb_short cpu_read8() {
     return read8(_cpr.PC++);
+}
+gb_short_s cpu_read8s() {
+    return read8s(_cpr.PC++);
 }
 
 
@@ -62,16 +84,15 @@ static inline void setPC(gb_long a) {
 
 
 void init_cpu() {
-    setAF(0x01B0);
+    setAF(0x11B0);
     setBC(0x0013);
     setDE(0x00D8);
     setHL(0x014D);
     setSP(0xFFFE);
-    setPC(0x0150);
+    setPC(0x0100);
 }
 
 // Read helpers (for clarity)
-// TODO: Cast to gb_longs before shifts.
 static inline gb_short A() { return _cpr.A; }
 static inline gb_short F() { return _cpr.F; }
 static inline gb_short B() { return _cpr.B; }
@@ -139,7 +160,7 @@ static gb_short dec8(gb_short reg) {
     reg--;
     setZero(!reg);
     setSubs(1);
-    setHalf(!(reg & 0xf));
+    setHalf(!!(reg & 0xf));
     return reg;
 }
 static gb_long dec16(gb_long reg) {
@@ -252,8 +273,7 @@ static gb_short xor8(gb_short val) {
 
 
 static gb_short or8(gb_short val) {
-	gb_short a = A();
-	gb_short f = a & val;
+	gb_short f = A() | val;
 	setZero(f == 0);
 	setCarr(0);
 	setSubs(0);
@@ -289,7 +309,7 @@ static void decSP() {
 
 
 static gb_long readSP() {
-	return read16( SP() );
+	return (gb_long)read8(SP()+1) | (gb_long)read8(SP()+2)<<8;
 }
 
 
@@ -300,17 +320,18 @@ static void ret() {
 
 
 static void jump() {
-	setPC( read16( PC() ) );
+	setPC( cpu_read16() );
 }
 
 
 static void push(gb_long val) {
+	write8( SP(), (gb_short)(val>>8) );
+    write8( SP()-1, (gb_short)(val) );
 	decSP();
-	write16( SP(), val );
 }
 
 static void call() {
-	push(PC());
+	push(PC()+2);
 	setPC( cpu_read16() );
 }
 
@@ -323,6 +344,13 @@ static void reset(gb_long val) {
 
 // CPU operations
 void exec_op(gb_short op_code) {
+    if(counter++ > 40000) {
+        printf("We're done!");
+        reboot();
+        while(1); // Hang
+    }
+
+    
     switch(op_code) {
     case 0x00:
       break;
@@ -1121,7 +1149,7 @@ void exec_op(gb_short op_code) {
 	
 	
     case 0xF0:
-      setA( read8( cpu_read8() ) );
+      setA( read8( 0xFF00 | cpu_read8() ) );
       break;
     case 0xF1:
       setAF(readSP());
@@ -1173,7 +1201,9 @@ void exec_op(gb_short op_code) {
     case 0xFF:
       reset(0x38);
       break;	
-	
+    default:
+      printf("Instruction %04x not implemented", op_code);
+      break;
 	
 	
     }

@@ -62,6 +62,8 @@ clean :
 
 install: $(NAME).bin
 	rpi-install.py $(NAME).bin
+	rm screenlog.0 
+	screen -L /dev/tty.SLAB_USBtoUART 115200
 
 #rom_build: $(ROMS:.gb=.h)
 #
