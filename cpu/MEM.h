@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "printf.h"
 #include "malloc.h"
+#include "cpu_instrs.h"
 
 /* 
  *         Layout of memory (taken from Pan Docs)
