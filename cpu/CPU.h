@@ -5,6 +5,7 @@
 #include "MEM.h"
 
 void init_cpu();
+void cpu_step();
 
 // Mem access
 gb_short cpu_read8();

@@ -17,6 +17,9 @@ struct {
 
 } _cpr;
 
+void cpu_step() {
+    exec_op(cpu_read8());
+}
 
 // Mem access
 gb_short cpu_read8() {
