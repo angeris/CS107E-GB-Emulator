@@ -15,7 +15,7 @@ Under the `roms/` directory, there should be a `cpu_instrs.c` file. This file co
 Anyways, in order to do this nicely, we require another emulator that at least passes these tests (some of which can be found in the link above); in particular, it should be an open source emulator. In order to test it, all of the register values should be dumped into some text file with some standard format. That is, find the place where the opcodes are executed and, every time an opcode is executed print out both the opcode and the current register values in one line; for example
 
 ```python
-AF:0xAAAA,BC:0xBBBB,DE:0xCCCC,GH:0xDDDD,SP:0xEEEE,PC:0xFFFF,OP:0xEF
+AF:0xAAAA,BC:0xBBBB,DE:0xCCCC,HL:0xDDDD,SP:0xEEEE,PC:0xFFFF,OP:0xEF
 ```
 
 This should be step one with the ROM that is provided and some known, working emulator. See if there's an open source Python emulator (probably will be the most legible and easiest to run out-of-the-box) and use that to test it.
