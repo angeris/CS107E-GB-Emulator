@@ -1,3 +1,6 @@
+#ifndef PROTO_H
+#define PROTO_H
+
 #include "uart.h"
 int printf(char *,...);
 void PUT32(unsigned,unsigned);
@@ -17,3 +20,5 @@ int in_critical_section(unsigned _pc);
 
 typedef volatile long long cnt_t;
 extern cnt_t a,b;
+
+#endif

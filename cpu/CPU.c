@@ -81,6 +81,7 @@ static inline gb_short E() { return _cpr.E; }
 static inline gb_short H() { return _cpr.H; }
 static inline gb_short L() { return _cpr.L; }
 static inline gb_long SP() { return _cpr.SP; }
+static inline gb_long PC() { return _cpr.PC; }
 static inline gb_long BC() { return _cpr.B << 8 | _cpr.C; }
 static inline gb_long DE() { return _cpr.D << 8 | _cpr.E; }
 static inline gb_long HL() { return _cpr.H << 8 | _cpr.L; }
@@ -128,8 +129,8 @@ gb_short isCarr() { return !!(F_CARR & _cpr.F); }
 static gb_short inc8(gb_short reg) {
     reg++;
     setzero(!reg);
-    issubs(0);
-    ishalf(!(reg & 0xf));
+    setSubs(0);
+    setHalf(!(reg & 0xf));
     return reg;
 }
 static gb_long inc16(gb_long reg) {
@@ -138,8 +139,8 @@ static gb_long inc16(gb_long reg) {
 static gb_short dec8(gb_short reg) {
     reg--;
     setzero(!reg);
-    issubs(1);
-    ishalf(!(reg & 0xf));
+    setSubs(1);
+    setHalf(!(reg & 0xf));
     return reg;
 }
 static gb_long dec16(gb_long reg) {
@@ -208,6 +209,120 @@ static gb_long add16(gb_long a, gb_long b) {
     return (gb_long)f;
 }
 
+static gb_short add8(gb_short val) {
+	gb_short a = A();
+	unsigned f = (unsigned)a + (unsigned)val;
+	
+	setSubs(0);
+	setCarr(f > 0xFF);
+	setHalf((a&0xF) + (b&0xF) > 0xF);
+	setZero(f == 0);
+	return (gb_short)f;
+}
+
+static gb_short subtract8(gb_short val) {
+	gb_short a = A();
+	unsigned f = (unsigned)a - (unsigned)val;
+	setSubs(1);
+	setCarr((gb_short)f > a);
+	setHalf((a&0xF) < (val&0xF));
+	setZero(f == 0);
+	return (gb_short)f;
+}
+
+
+static gb_short and8(gb_short val) {
+	gb_short a = A();
+	gb_short f = a & val;
+	setZero(f == 0);
+	setSubs(0);
+	setHalf(1);
+	setCarr(0);
+	return f;
+}
+
+
+static gb_short xor8(gb_short val) {
+	gb_short a = A();
+	gb_short f = a ^ val;
+	setZero(f == 0);
+	setCarr(0);
+	setSubs(0);
+	setHalf(0);
+	return f;
+}
+
+
+static gb_short or8(gb_short val) {
+	gb_short a = A();
+	gb_short f = a & val;
+	setZero(f == 0);
+	setCarr(0);
+	setSubs(0);
+	setHalf(0);
+	return f;
+}
+
+
+static gb_short cp8(gb_short val) {
+	gb_short a = A();
+	unsigned f = (unsigned)a - (unsigned)val;
+	setZero(f == 0);
+	setSubs(1);
+	setCarr((gb_short)f > a);
+	setHalf(0);
+	return (gb_short)f;
+}
+
+
+static void incSP() {
+	setSP( SP() + 2 );
+}
+
+
+static void incPC() {
+	setPC( PC() + 2 );
+}
+
+
+static void decSP() {
+	setSP( SP() - 2 );
+}
+
+
+static gb_long readSP() {
+	return read16( SP() );
+}
+
+
+static void ret() {
+	setPC( readSP() );
+	incSP();
+}
+
+
+static void jump() {
+	setPC( read16( PC() ) );
+}
+
+
+static void push(gb_long val) {
+	decSP();
+	ram_write16( SP(), val );
+}
+
+static void call() {
+	push(PC());
+	setPC( read16() );
+}
+
+
+static void reset(gb_long val) {
+	push(PC());
+	setPC(val);
+}
+
+
 // CPU operations
 void exec_op(gb_short op_code) {
     switch(op_code) {
@@ -241,7 +356,7 @@ void exec_op(gb_short op_code) {
       setHL( add16(HL(), BC()) );
       break; 
     case 0x0A:
-      setA( read16(BC()) );
+      setA( read8(BC()) );
       break;
     case 0x0B:
       setBC( dec16( BC() ) );
@@ -266,7 +381,7 @@ void exec_op(gb_short op_code) {
       setDE(cpu_read16()); 
       break;
     case 0x12:
-      ram_write8((DE), A());
+      ram_write8(DE(), A());
       break;
     case 0x13:
       setDE( inc16( DE() ) );
@@ -289,7 +404,7 @@ void exec_op(gb_short op_code) {
       setHL( add16(HL(), DE()) );
       break;
     case 0x1A:
-      setA( read16(DE()) );
+      setA( read8(DE()) );
       break;
     case 0x1B:
       setDE( dec16( DE() ) );
@@ -339,7 +454,7 @@ void exec_op(gb_short op_code) {
       setHL( add16(HL(), HL()) );
       break;
     case 0x2A:
-      setA( read16(HL()) );
+      setA( read8(HL()) );
 	  setHL( inc16(HL() ) );
       break;
     case 0x2B:
@@ -390,7 +505,7 @@ void exec_op(gb_short op_code) {
       setHL( add16(HL(), SP()) );
       break;
     case 0x3A:
-      setA( read16(HL()) );
+      setA( read8(HL()) );
 	  setHL( dec16(HL() ) );
       break;
     case 0x3B:
@@ -411,54 +526,660 @@ void exec_op(gb_short op_code) {
 	
 
 	case 0x40:
+		setB( B() );
+		break;
+    case 0x41:
+		setB( C() );
+		break;
+    case 0x42:
+		setB( D() );
+		break;
+    case 0x43:
+		setB( E() );
+		break;
+	case 0x44:
+		setB( H() );
+		break;
+    case 0x45:
+		setB( L() );
+		break;
+    case 0x46:
+		setB( read8( HL() ) );
+		break;
+    case 0x47:
+		setB( A() );
+		break;
+    case 0x48:
+		setC( B() );
+		break;
+    case 0x49:
+		setC( C() );
+		break;
+    case 0x4A:
+		setC( D() );
+		break;
+    case 0x4B:
+		setC( E() );
+		break;
+    case 0x4C:
+		setC( H() );
+		break;
+	case 0x4D:
+		setC( L() );
+		break;
+    case 0x4E:
+		setC( read8( HL() ) );
+		break;
+    case 0x4F:
+		setC( A() );
+		break;
+	
+	case 0x50:
+		setD( B() );
+		break;
+    case 0x51:
+		setD( C() );
+		break;
+    case 0x52:
+		setD( D() );
+		break;
+    case 0x53:
+		setD( E() );
+		break;
+	case 0x54:
+		setD( H() );
+		break;
+    case 0x55:
+		setD( L() );
+		break;
+    case 0x56:
+		setD( read8( HL() ) );
+		break;
+    case 0x57:
+		setD( A() );
+		break;
+    case 0x58:
+		setE( B() );
+		break;
+    case 0x59:
+		setE( C() );
+		break;
+    case 0x5A:
+		setE( D() );
+		break;
+    case 0x5B:
+		setE( E() );
+		break;
+    case 0x5C:
+		setE( H() );
+		break;
+	case 0x5D:
+		setE( L() );
+		break;
+    case 0x5E:
+		setE( read8( HL() ) );
+		break;
+    case 0x5F:
+		setE( A() );
+		break;
 		
-      break;
-    case 0x31:
-	  setSP(cpu_read16()); 
-      break;
-    case 0x32:
-      ram_write8(HL(), A());
-	  setHL( dec16( HL() ) );
-      break;
-    case 0x33:
-      setSP( inc16( SP() ) );
-    case 0x34:
-      ram_write16(HL(), inc16( cpu_read16( HL() ) ) );
-      break;
-    case 0x35:
-      ram_write16(HL(), dec16( cpu_read16( HL() ) ) );
-      break;
-    case 0x36:
-      ram_write16(HL(), cpu_read8());
-      break;
-    case 0x37:
-      //SCF();
-      breaK;
-    case 0x38:
-      jump_relative_with_cond(isCarr());
-      break;
-    case 0x39:
-      setHL( add16(HL(), SP()) );
-      break;
-    case 0x3A:
-      setA( read16(HL()) );
-	  setHL( dec16(HL() ) );
-      break;
-    case 0x3B:
-      setSP( dec16( SP() ) );
-      break;
-    case 0x3C:
-      setA( inc8( A() ) );
-      break;
-    case 0x3D:
-      setA( dec8( A() ) );
-      break;
-    case 0x3E:
-      setA( cpu_read8());
-      break;
-    case 0x3F:
-      //CCF()
-      break;
+		
+	case 0x60:
+		setH( B() );
+		break;
+    case 0x61:
+		setH( C() );
+		break;
+    case 0x62:
+		setH( D() );
+		break;
+    case 0x63:
+		setH( E() );
+		break;
+	case 0x64:
+		setH( H() );
+		break;
+    case 0x65:
+		setH( L() );
+		break;
+    case 0x66:
+		setH( read8( HL() ) );
+		break;
+    case 0x67:
+		setH( A() );
+		break;
+    case 0x68:
+		setL( B() );
+		break;
+    case 0x69:
+		setL( C() );
+		break;
+    case 0x6A:
+		setL( D() );
+		break;
+    case 0x6B:
+		setL( E() );
+		break;
+    case 0x6C:
+		setL( H() );
+		break;
+	case 0x6D:
+		setL( L() );
+		break;
+    case 0x6E:
+		setL( read8( HL() ) );
+		break;
+    case 0x6F:
+		setL( A() );
+		break;
+	
+	
+	case 0x70:
+		ram_write8( HL(), B() );
+		break;
+    case 0x71:
+		ram_write8( HL(), C() );
+		break;
+    case 0x72:
+		ram_write8( HL(), D() );
+		break;
+    case 0x73:
+		ram_write8( HL(), E() );
+		break;
+	case 0x74:
+		ram_write8( HL(), H() );
+		break;
+    case 0x75:
+		ram_write8( HL(), L() );
+		break;
+    case 0x76:
+		//halt <- should probably have a halt flag that waits until the next interrupt
+		break;
+    case 0x77:
+		ram_write8( HL(), A() );
+		break;
+    case 0x78:
+		setA( B() );
+		break;
+    case 0x79:
+		setA( C() );
+		break;
+    case 0x7A:
+		setA( D() );
+		break;
+    case 0x7B:
+		setA( E() );
+		break;
+    case 0x7C:
+		setA( H() );
+		break;
+	case 0x7D:
+		setA( L() );
+		break;
+    case 0x7E:
+		setA( read8( HL() ) );
+		break;
+    case 0x7F:
+		setA( A() );
+		break;
+		
+		
+	case 0x80:
+		setA( add8( B() ) );
+		break;
+    case 0x81:
+		setA( add8( C() ) );
+		break;
+    case 0x82:
+		setA( add8( D() ) );
+		break;
+    case 0x83:
+		setA( add8( E() ) );
+		break;
+	case 0x84:
+		setA( add8( F() ) );
+		break;
+    case 0x85:
+		setA( add8( L() ) );
+		break;
+    case 0x86:
+		setA( add8( read8( HL() ) ) );
+		break;
+    case 0x87:
+		setA( add8( A() ) );
+		break;
+    case 0x88:
+		setA( add8( B() + isCarr() ) );
+		break;
+    case 0x89:
+		setA( add8( C() + isCarr() ) );
+		break;
+    case 0x8A:
+		setA( add8( D() + isCarr() ) );
+		break;
+    case 0x8B:
+		setA( add8( E() + isCarr() ) );
+		break;
+	case 0x8C:
+		setA( add8( F() + isCarr() ) );
+		break;
+    case 0x8D:
+		setA( add8( L() + isCarr() ) );
+		break;
+    case 0x8E:
+		setA( add8( read8( HL() ) + isCarr() ) );
+		break;
+    case 0x8F:
+		setA( add8( A() + isCarr() ) );
+		break;
+		
+		
+	case 0x90:
+		setA( subtract8( B() ) );
+		break;
+    case 0x91:
+		setA( subtract8( C() ) );
+		break;
+    case 0x92:
+		setA( subtract8( D() ) );
+		break;
+    case 0x93:
+		setA( subtract8( E() ) );
+		break;
+	case 0x94:
+		setA( subtract8( F() ) );
+		break;
+    case 0x95:
+		setA( subtract8( L() ) );
+		break;
+    case 0x96:
+		setA( subtract8( read8( HL() ) ) );
+		break;
+    case 0x97:
+		setA( subtract8( A() ) );
+		break;
+    case 0x98:
+		setA( subtract8( B() + isCarr() ) );
+		break;
+    case 0x99:
+		setA( subtract8( C() + isCarr() ) );
+		break;
+    case 0x9A:
+		setA( subtract8( D() + isCarr() ) );
+		break;
+    case 0x9B:
+		setA( subtract8( E() + isCarr() ) );
+		break;
+	case 0x9C:
+		setA( subtract8( F() + isCarr() ) );
+		break;
+    case 0x9D:
+		setA( subtract8( L() + isCarr() ) );
+		break;
+    case 0x9E:
+		setA( subtract8( read8( HL() ) + isCarr() ) );
+		break;
+    case 0x9F:
+		setA( subtract8( A() + isCarr() ) );
+		break;
+		
+		
+	case 0xA0:
+		setA( and8( B() ) );
+		break;
+    case 0xA1:
+		setA( and8( C() ) );
+		break;
+    case 0xA2:
+		setA( and8( D() ) );
+		break;
+    case 0xA3:
+		setA( and8( E() ) );
+		break;
+	case 0xA4:
+		setA( and8( F() ) );
+		break;
+    case 0xA5:
+		setA( and8( L() ) );
+		break;
+    case 0xA6:
+		setA( and8( read8( HL() ) ) );
+		break;
+    case 0xA7:
+		setA( and8( A() ) );
+		break;
+    case 0xA8:
+		setA( xor8( B() ) );
+		break;
+    case 0xA9:
+		setA( xor8( C() ) );
+		break;
+    case 0xAA:
+		setA( xor8( D() ) );
+		break;
+    case 0xAB:
+		setA( xor8( E() ) );
+		break;
+	case 0xAC:
+		setA( xor8( F() ) );
+		break;
+    case 0xAD:
+		setA( xor8( L() ) );
+		break;
+    case 0xAE:
+		setA( xor8( read8( HL() ) ) );
+		break;
+    case 0xAF:
+		setA( xor8( A() ) );
+		break;
+		
+		
+	case 0xB0:
+		setA( or8( B() ) );
+		break;
+    case 0xB1:
+		setA( or8( C() ) );
+		break;
+    case 0xB2:
+		setA( or8( D() ) );
+		break;
+    case 0xB3:
+		setA( or8( E() ) );
+		break;
+	case 0xB4:
+		setA( or8( F() ) );
+		break;
+    case 0xB5:
+		setA( or8( L() ) );
+		break;
+    case 0xB6:
+		setA( or8( read8( HL() ) ) );
+		break;
+    case 0xB7:
+		setA( or8( A() ) );
+		break;
+    case 0xB8:
+		setA( cp8( B() ) );
+		break;
+    case 0xB9:
+		setA( cp8( C() ) );
+		break;
+    case 0xBA:
+		setA( cp8( D() ) );
+		break;
+    case 0xBB:
+		setA( cp8( E() ) );
+		break;
+	case 0xBC:
+		setA( cp8( F() ) );
+		break;
+    case 0xBD:
+		setA( cp8( L() ) );
+		break;
+    case 0xBE:
+		setA( cp8( read8( HL() ) ) );
+		break;
+    case 0xBF:
+		setA( cp8( A() ) );
+		break;	
+	
+	
+	case 0xC0:
+		if (!isZero()) {
+			ret();
+		}
+		break;
+    case 0xC1:
+		setBC(readSP());
+		incSP();
+		break;
+    case 0xC2:
+		if (!isZero()) {
+			jump();
+		}
+		else {
+			incPC();
+		}
+		break;
+    case 0xC3:
+		jump();
+		break;
+	case 0xC4:
+		if ( !isZero() ) {
+			call();
+		}
+		else {
+			incPC();
+		}
+		break;
+    case 0xC5:
+		push(BC());
+		break;
+    case 0xC6:
+		add8(read8());
+		break;
+    case 0xC7:
+		reset(0x00);
+		break;
+    case 0xC8:
+		if (isZero()) {
+			ret();
+		}
+		break;
+    case 0xC9:
+		ret();
+		break;
+    case 0xCA:
+		if (isZero()) {
+			jump();
+		}
+		else {
+			incPC();
+		}
+		break;
+    case 0xCB:
+		//prefix CB
+		break;
+	case 0xCC:
+		if (isZero()) {
+			call();
+		}
+		else {
+			incPC();
+		}
+		break;
+    case 0xCD:
+		call();
+		break;
+    case 0xCE:
+		setA( add8( read8() + isCarr() ) );
+		break;
+    case 0xCF:
+		reset(0x08);
+		break;
+		
+		
+	case 0xD0:
+		if (!isCarr()) {
+			ret();
+		}
+		break;
+    case 0xD1:
+		setDE(readSP());
+		incSP();
+		break;
+    case 0xD2:
+		if (!isCarr()) {
+			jump();
+		}
+		else {
+			incPC();
+		}
+		break;
+    case 0xD3:
+		break;
+	case 0xD4:
+		if ( !isCarr() ) {
+			call();
+		}
+		else {
+			incPC();
+		}
+		break;
+    case 0xD5:
+		push(DE());
+		break;
+    case 0xD6:
+		setA( subtract8( read8() ) );
+		break;
+    case 0xD7:
+		reset(0x10);
+		break;
+    case 0xD8:
+		if ( isCarr() ) {
+			ret();
+		}
+		break;
+    case 0xD9:
+		ret();
+		//ENABLE INTERRUPTS
+		break;
+    case 0xDA:
+		if (isCarr()) {
+			jump();
+		}
+		else {
+			incPC();
+		}
+		break;
+    case 0xDB:
+		break;
+	case 0xDC:
+		if (isCarr()) {
+			call();
+		}
+		else {
+			incPC();
+		}
+		break;
+    case 0xDD:
+		break;
+    case 0xDE:
+		setA( subtract8( read8() + isCarr() ) );
+		break;
+    case 0xDF:
+		reset(0x18);
+		break;
+		
+		
+	case 0xE0:
+		ram_write8(0XFF00 + cpu_read8(), A());
+		break;
+    case 0xE1:
+		setHL(readSP());
+		incSP();
+		break;
+    case 0xE2:
+		ram_write8( C(), A() );
+		break;
+    case 0xE3:
+		break;
+	case 0xE4:
+		break;
+    case 0xE5:
+		push(HL());
+		break;
+    case 0xE6:
+		setA( and8( read8() ) );
+		break;
+    case 0xE7:
+		reset(0x20);
+		break;
+    case 0xE8:
+		unsigned a = (unsigned) SP();
+		signed b = read8s(PC());
+		unsigned val = a + b;
+		setZero(0);
+		setSubs(0);
+		setHalf((a&0xFFF) + (b&0xFFF) > 0xFFF);
+		setCarr(val >= 0 && val <= 0xFF);
+		setSP((gb_long)val);
+		break;
+    case 0xE9:
+		setPC(read16(HL()));
+		break;
+    case 0xEA:
+		ram_write8(cpu_read16(), A());
+		break;
+    case 0xEB:
+		break;
+	case 0xEC:
+		break;
+    case 0xED:
+		break;
+    case 0xEE:
+		setA( xor8( read8() ) );
+		break;
+    case 0xEF:
+		reset(0x28);
+		break;	
+	
+	
+	case 0xF0:
+		setA( read8( cpu_read8() ) );
+		break;
+    case 0xF1:
+		setAF(readSP());
+		incSP();
+		break;
+    case 0xF2:
+		setA( read8( C() ) );
+		break;
+    case 0xF3:
+		//disable interrupts
+		break;
+	case 0xF4:
+		break;
+    case 0xF5:
+		push(AF());
+		break;
+    case 0xF6:
+		setA( or8( cpu_read8() ) );
+		break;
+    case 0xF7:
+		reset(0x30);
+		break;
+    case 0xF8:
+		unsigned a = (unsigned) SP();
+		signed b = read8s(PC());
+		unsigned val = a + b;
+		setHL((gb_long)val);
+		setZero(0);
+		setSubs(0);
+		setHalf((a&0xFFF) + (b&0xFFF) > 0xFFF);
+		setCarr(val >= 0 && val <= 0xFF);
+		break;
+    case 0xF9:
+		setSP( HL() );
+		break;
+    case 0xFA:
+		setA( read8( cpu_read16() ) );
+		break;
+    case 0xFB:
+		//enable interrupts
+		break;
+	case 0xFC:
+		break;
+    case 0xFD:
+		break;
+    case 0xFE:
+		setA( cp8( cpu_read8() ) );
+		break;
+    case 0xFF:
+		reset(0x38);
+		break;	
+	
+	
 	
     }
 
