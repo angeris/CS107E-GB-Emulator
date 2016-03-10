@@ -7,7 +7,7 @@ OBJCOPY = $(ARMGNU)-objcopy
 OBJDUMP = $(ARMGNU)-objdump
 STRIP = $(ARMGNU)-strip
 
-CPPFLAGS = -Iinclude/ -Icpu/
+CPPFLAGS = -Iinclude/ -Icpu/ -Iroms/
 CFLAGS = -std=c99 -Wall -Og -g -ffreestanding $(CPPFLAGS)
 ASFLAGS =
 LDFLAGS  = -nostdlib -T memmap -Llib/
