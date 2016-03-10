@@ -51,6 +51,14 @@ static inline void setHL(gb_long l) {
     _cpr.L = (gb_short)(l&0xFF);
 }
 
+static inline void setSP(gb_long a) {
+  _cpr.SP = a;
+}
+
+static inline void setPC(gb_long a) {
+  _cpr.PC = a; 
+}
+
 
 void init_cpu() {
     setAF(0x01B0);
@@ -86,8 +94,6 @@ static inline void setD(gb_short a) { _cpr.D = a; }
 static inline void setE(gb_short a) { _cpr.E = a; }
 static inline void setH(gb_short a) { _cpr.H = a; }
 static inline void setL(gb_short a) { _cpr.L = a; }
-static inline void setSP(gb_long a) { _cpr.SP = a; }
-static inline void setPC(gb_long a) { _cpr.PC = a; }
 
 // Flags
 void setZero(gb_short i) {
