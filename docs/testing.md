@@ -28,8 +28,8 @@ After all of that is done, we should be good to start incorporating the controll
 Also, please don't hesitate to message me throughout <3
 
 ### Checklist
-[ ] Find a working emulator which passes all of the tests. Do this by just running the rom, which will print out a message to the emulator screen, if it doesn't fail.
-[ ] Add a print-to-file statement any time an opcode is executed (probably in the main loop) to dump all of the registers and the current `PC` into a line (there may be some trouble if there are interrupts, but in this case you should just message me, `diff` should just report that we added a crapload of lines in between cases, so I think we should be fine).
-[ ] Print each executed instruction of our emulator into `screen`, then dump the entire `screen` session into a file (I would recommend doing all of this inside of the make-install).
-[ ] Diff out between files and then see what opcodes have caused failures.
-[ ] Go and correct those failures and re-dump the `screen`.
+- [ ] Find a working emulator which passes all of the tests. Do this by just running the rom, which will print out a message to the emulator screen, if it doesn't fail.
+- [ ] Add a print-to-file statement any time an opcode is executed (probably in the main loop) to dump all of the registers and the current `PC` into a line (there may be some trouble if there are interrupts, but in this case you should just message me, `diff` should just report that we added a crapload of lines in between cases, so I think we should be fine).
+- [ ] Print each executed instruction of our emulator into `screen`, then dump the entire `screen` session into a file (I would recommend doing all of this inside of the make-install).
+- [ ] Diff out between files and then see what opcodes have caused failures.
+- [ ] Go and correct those failures and re-dump the `screen`.
