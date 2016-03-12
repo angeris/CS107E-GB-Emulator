@@ -15,7 +15,8 @@ unsigned int WindowX; // (0xFF4B): The X Positions -7 of the VIEWING AREA to sta
 */
 
 gb_short gpu_read(gb_long addr) {
-    return vram[addr]; // Not sure if this is correct
+    if(addr >= 0x8000 && addr <= 0x9FFF) return vram[addr]; // Not sure if this is correct
+    else return 0;
 }
 
 void gpu_init() {
@@ -106,8 +107,7 @@ void draw_tile(gb_short control) {
     int windowInUse = 0; // boolean variable
     int unsig = 1;
 
-    if(control & WIN_DISP_ENABLE) {
-        // Check if current window is within windows Y position
+    if(control & WIN_DISP_ENABLE) { // Check if current window is within windows Y position
         if(windowY <= gpu_read(SCROLLY + 2)) { // 0xFF44
             windowInUse = 1;
         }
