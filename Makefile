@@ -17,6 +17,7 @@ LDLIBS = -lpi -lgcc
 
 NAME = main
 CONTROLLER = main_controller
+GPU = main_gpu
 
 C_SRCS = $(NAME).c cstart.c malloc.c printf.c gl.c fb.c cpu/CPU.c cpu/MEM.c roms/cpu_instrs.c
 S_SRCS = start.s
@@ -24,8 +25,21 @@ S_SRCS = start.s
 ROMS = Pokemon_Red.gb Tetris.gb
 
 CONTROLLER_SRCS = $(CONTROLLER).c cstart.c malloc.c printf.c gl.c fb.c interrupt.c controller/controller.c 
+GPU_SRCS = $(GPU).c cstart.c malloc.c printf.c gl.c fb.c interrupt.c controller/controller.c cpu/GPU.c
 
 all : $(NAME).bin
+
+# GPU Specific Make
+$(GPU).exe : $(S_SRCS:.s=.o) $(GPU_SRCS:.c=.o)
+	$(LD) $(LDFLAGS) $^ $(LDLIBS) -o $@
+
+$(GPU).bin : $(GPU).exe
+	$(OBJCOPY) $< -O binary $@
+
+gpu : $(GPU).bin
+
+install-gpu: $(GPU).bin
+	rpi-install.py $(GPU).bin
 
 # Controller Specific Make - don't know if this is correct/efficient but it works
 $(CONTROLLER).exe : $(S_SRCS:.s=.o) $(CONTROLLER_SRCS:.c=.o)
@@ -59,6 +73,7 @@ install-controller: $(CONTROLLER).bin
 clean :
 	rm -rf *.bin *.exe *.o *.d *.list
 	rm -rf lib/*.bin lib/*.exe lib/*.o lib/*.d lib/*.list
+	clear
 
 install: $(NAME).bin
 	rpi-install.py $(NAME).bin

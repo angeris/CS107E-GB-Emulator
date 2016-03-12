@@ -16,7 +16,7 @@ void gl_init(unsigned width, unsigned height, unsigned mode);
 #define GL_GREEN 0xFF00FF00
 #define GL_BLUE  0xFFFF0000
 
-#define MIN(x,y) ((x)<(y))?(x):(y)
+// #define MIN(x,y) ((x)<(y))?(x):(y) // previously defined in printf.h
 
 #define GL_MAX_FONT_SIZE 12*18
 
