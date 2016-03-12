@@ -3,12 +3,38 @@
 
 #include "MEM.h"
 
+/**
+ *                  Layout of Tile Sets in memory
+ *   http://imrannazar.com/GameBoy-Emulation-in-JavaScript:-Graphics
+ * ------------------------------------------------------------------------
+ *  Region	         Usage
+ * =========    ========================
+ * 8000-87FF	Tile set #1: tiles 0-127
+ * 8800-8FFF	Tile set #1: tiles 128-255 & Tile set #0: tiles -1 to -128
+ * 9000-97FF	Tile set #0: tiles 0-127
+ * 9800-9BFF	Tile map (Background) #0
+ * 9C00-9FFF	Tile map (Background) #1
+ * ----------------------------------------
+ * FE00-FE9F   Sprite Attribute Table (OAM)
+ */
+
+#define TILE_SET_1U 0x8000 /* Unsigned Tile Region */
+#define TILE_SET_1S 0x8800 /* Signed Tile Region */
+#define TILE_SET_BG_0 0x9800
+#define TILE_SET_BG_1 0x9C00
+
 /* Graphics Library */
 // define colors
 #define WIN_WIDTH 160
 #define WIN_HEIGHT 144
 
 /* Primarily Drawn From - http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html */
+
+/* Scroll and Window Positions */
+#define SCROLLY 0xFF42
+#define SCROLLX 0xFF43
+#define WINDOWY 0xFF4A
+#define WINDOWX 0xFF4B
 
 /* LCD Control Register */
 #define LCD_CONTROL_REG 0xFF40 // check 
@@ -39,7 +65,7 @@ void gpu_drawscreen();
 
 void gpu_init();
 
-void draw_tile();
+void draw_tile(gb_short control);
 void draw_sprite();
 
 #endif

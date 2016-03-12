@@ -7,20 +7,20 @@ static unsigned _gpu_line;
 
 // define 
 
+/*
 unsigned int ScrollY; // (0xFF42): The Y Position of the BACKGROUND where to start drawing the viewing area from 
 unsigned int ScrollX; // (0xFF43): The X Position of the BACKGROUND to start drawing the viewing area from
 unsigned int WindowY; // (0xFF4A): The Y Position of the VIEWING AREA to start drawing the window from
 unsigned int WindowX; // (0xFF4B): The X Positions -7 of the VIEWING AREA to start drawing the window from
+*/
 
 gb_short gpu_read(gb_long addr) {
-    /* TODO: Implement this */
-    gb_short yeet = 0x00;
-    return yeet;
+    return vram[addr]; // Not sure if this is correct
 }
 
 void gpu_init() {
     gl_init( WIN_WIDTH, WIN_HEIGHT, 1);
-    ScrollY = ScrollX = WindowY = WindowX = 0;
+    // ScrollY = ScrollX = WindowY = WindowX = 0;
     printf("gpu_init\n");
 }
 
@@ -79,7 +79,7 @@ void gpu_writeline() {
     gb_short control = gpu_read(LCD_CONTROL_REG); 
 
     if(control & BG_DISPLAY_ENAB) { 
-        draw_tile();
+        draw_tile(control);
     }
 
     if(control & OBJ_SPRITE_ENAB) {
@@ -94,7 +94,38 @@ void gpu_drawscreen() {
     //TODO: Draw everything into the framebuffer; probably just swap the buffer out
 }
 
-void draw_tile() {
+void draw_tile(gb_short control) {
+    gb_long tileMem = 0;
+    gb_long bgMem = 0;
+
+    gb_short scrollY = gpu_read(SCROLLY) ;
+    gb_short scrollX = gpu_read(SCROLLX) ;
+    gb_short windowY = gpu_read(WINDOWY) ;
+    gb_short windowX = gpu_read(WINDOWX) - 7;
+
+    int windowInUse = 0; // boolean variable
+    int unsig = 1;
+
+    if(control & WIN_DISP_ENABLE) {
+        // Check if current window is within windows Y position
+        if(windowY <= gpu_read(SCROLLY + 2)) { // 0xFF44
+            windowInUse = 1;
+        }
+    }
+
+    // Choose Tile Data to Use
+    if(control & WIN_BG_TILEDATA) {
+        tileMem = TILE_SET_1U;
+    } else {
+        tileMem = TILE_SET_1S;
+        unsig = 0; 
+    }
+
+    if(!windowInUse) { // Choose Background Tile Set To Use
+        (control & BG_TILE_MAP_SEL) ? (bgMem = TILE_SET_BG_1) : (bgMem = TILE_SET_BG_0);
+    } else { // Choose Window Tile Set To Use
+        (control & WIN_TILE_SELECT) ? (bgMem = TILE_SET_BG_1) : (bgMem = TILE_SET_BG_0);
+    }
 
 }
 
