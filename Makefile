@@ -7,7 +7,7 @@ OBJCOPY = $(ARMGNU)-objcopy
 OBJDUMP = $(ARMGNU)-objdump
 STRIP = $(ARMGNU)-strip
 
-CPPFLAGS = -Iinclude/ -Icpu/
+CPPFLAGS = -Iinclude/ -Icpu/ -Iroms/
 CFLAGS = -std=c99 -Wall -Og -g -ffreestanding $(CPPFLAGS)
 ASFLAGS =
 LDFLAGS  = -nostdlib -T memmap -Llib/
@@ -18,7 +18,7 @@ LDLIBS = -lpi -lgcc
 NAME = main
 CONTROLLER = main_controller
 
-C_SRCS = $(NAME).c cstart.c malloc.c printf.c gl.c fb.c cpu/CPU.c cpu/MEM.c cpu/main-cpu.c controller/controller.c
+C_SRCS = $(NAME).c cstart.c malloc.c printf.c gl.c fb.c cpu/CPU.c cpu/MEM.c roms/cpu_instrs.c
 S_SRCS = start.s
 
 ROMS = Pokemon_Red.gb Tetris.gb
@@ -59,10 +59,11 @@ install-controller: $(CONTROLLER).bin
 clean :
 	rm -rf *.bin *.exe *.o *.d *.list
 	rm -rf lib/*.bin lib/*.exe lib/*.o lib/*.d lib/*.list
-	clear
 
 install: $(NAME).bin
 	rpi-install.py $(NAME).bin
+	rm screenlog.0 
+	screen -L /dev/tty.SLAB_USBtoUART 115200
 
 #rom_build: $(ROMS:.gb=.h)
 #

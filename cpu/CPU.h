@@ -3,12 +3,15 @@
 
 #include "printf.h"
 #include "MEM.h"
+#include "DATA_TYPES.h"
 
 void init_cpu();
+void cpu_step();
+void exec_op(gb_short op_code); 
 
 // Mem access
 gb_short cpu_read8();
-gb_short cpu_read16();
+gb_long cpu_read16();
 
 // Flags:
 
