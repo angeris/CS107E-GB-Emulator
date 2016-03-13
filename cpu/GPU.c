@@ -1,5 +1,4 @@
 #include "GPU.h"
-#include "gl.h"
 
 static unsigned _gpu_mode;
 static unsigned _gpu_clock;
@@ -12,7 +11,6 @@ gb_short gpu_read(gb_long addr) {
 
 void gpu_init() {
     gl_init( WIN_WIDTH, WIN_HEIGHT, 1);
-    // ScrollY = ScrollX = WindowY = WindowX = 0;
     printf("gpu_init\n");
 }
 
@@ -26,7 +24,7 @@ void gpu_exec() {
     */
 
     switch(_gpu_mode) {
-    case MODE_HBLANK:
+        case MODE_HBLANK:
         if(_gpu_clock >= 201) {
             _gpu_clock = 0;
             _gpu_line++;
@@ -39,20 +37,20 @@ void gpu_exec() {
             _gpu_mode = MODE_READOM;   
         }
         break;
-    case MODE_VBLANK:
+        case MODE_VBLANK:
         if(_gpu_clock >= 4560) {
             _gpu_mode = MODE_READOM;
             _gpu_line = 0;
             _gpu_clock = 0;
         }
         break;
-    case MODE_READOM:
+        case MODE_READOM:
         if(_gpu_clock >= 77) {
             _gpu_mode = MODE_READAL;
             _gpu_clock = 0;
         }
         break;
-    case MODE_READAL:
+        case MODE_READAL:
         if(_gpu_clock >= 169) {
             _gpu_mode = MODE_HBLANK;
             _gpu_clock = 0;
@@ -65,25 +63,15 @@ void gpu_exec() {
 }
 
 void gpu_writeline() {
-    //TODO: A crapload of work
 
     // Check LCD Control Register
     gb_short control = gpu_read(LCD_CONTROL_REG); 
-
-    if(control & BG_DISPLAY_ENAB) { 
-        draw_tile(control);
-    }
-
-    if(control & OBJ_SPRITE_ENAB) {
-        draw_sprite();
-    }
-
-
+    if(control & BG_DISPLAY_ENAB) draw_tile(control);
+    if(control & OBJ_SPRITE_ENAB) draw_sprite();
 }
 
 void gpu_drawscreen() {
     gl_swap_buffer();
-    //TODO: Draw everything into the framebuffer; probably just swap the buffer out
 }
 
 void draw_tile(gb_short control) {
@@ -95,12 +83,12 @@ void draw_tile(gb_short control) {
     gb_short windowY = gpu_read(WINDOWY) ;
     gb_short windowX = gpu_read(WINDOWX) - 7;
 
-    int windowInUse = 0; // boolean variable
-    int unsig = 1;
+    int usingWindow = 0; // boolean - whether or not the window is in use
+    int unsig = 1; // boolean - whether or not tile set data is signed or unsigned
 
-    if(control & WIN_DISP_ENABLE) { // Check if current window is within windows Y position
+    if(control & WIN_DISP_ENABLE) { // Check if current window is within LCD Y position
         if(windowY <= gpu_read(LCDY)) {
-            windowInUse = 1;
+            usingWindow = 1;
         }
     }
 
@@ -112,14 +100,14 @@ void draw_tile(gb_short control) {
         unsig = 0; 
     }
 
-    if(!windowInUse) { // Choose Background Tile Set To Use
+    if(!usingWindow) { // Choose Background Tile Set To Use
         (control & BG_TILE_MAP_SEL) ? (bgMem = TILE_SET_BG_1) : (bgMem = TILE_SET_BG_0);
     } else { // Choose Window Tile Set To Use
         (control & WIN_TILE_SELECT) ? (bgMem = TILE_SET_BG_1) : (bgMem = TILE_SET_BG_0);
     }
 
-    gb_short yPos = 0; // Which of the 32 vertical tiles the current scanline is drawing
-    windowInUse ? (yPos = gpu_read(LCDY) - windowY) : (yPos = scrollY + gpu_read(LCDY));
+    gb_short yPos = 0; // Which of the 32 vertical tiles is the current scanline is drawing
+    usingWindow ? (yPos = gpu_read(LCDY) - windowY) : (yPos = scrollY + gpu_read(LCDY));
 
     // Choose which of the 8 vertical pixels of the current tile the sanline is on
     gb_long tileRow = (((gb_short)(yPos/8))*32);
@@ -128,7 +116,7 @@ void draw_tile(gb_short control) {
     gb_short xPos;
     for(int px = 0; px < 160; px++) {
         xPos = px+scrollX;
-        if(windowInUse && (px >= windowX)) xPos = px - windowX;
+        if(usingWindow && (px >= windowX)) xPos = px - windowX;
 
         gb_long tileCol = (xPos/8);
         gb_long_s tileNum;
@@ -166,12 +154,48 @@ void draw_tile(gb_short control) {
         (data1 << cBit) ? (cNum |= 1) : (cNum |= 0);
 
         // Get actual color from background color palette
+        color c = get_color(cNum, (gb_long)BGPD);
+        int finalY = gpu_read(LCDY);
 
-        // Write to the framebuffer via graphics library
+        // Check To Be Within Bounds
+        if ((finalY<0) || (finalY>143) || (px<0) || (px>159)) continue;
+
+        gl_draw_pixel(px, finalY, c);
     }
 
 }
 
 void draw_sprite() {
 
+}
+
+color get_color(gb_short ncolor, gb_long paladdr) {
+    color result = WHITE;
+    gb_short palette = gpu_read(paladdr);
+    int hi = 0;
+    int lo = 0;
+
+    // Find which bits of the color palette the color #s map to
+    switch (ncolor) {
+        case 0: hi = 1; lo = 0; break;
+        case 1: hi = 3; lo = 2; break; 
+        case 2: hi = 5; lo = 4; break; 
+        case 3: hi = 7; lo = 6; break;
+    }
+
+    // Get the color from the palette
+    int color = 0;
+    color = (palette << hi);
+    color = color << 1;
+    color |= (palette << lo);
+
+    // Convert to Graphics Library color
+    switch (color) {
+        case 0: result = WHITE; break;
+        case 1: result = LGRAY; break;
+        case 2: result = DGRAY; break;
+        case 3: result = BLACK; break;
+    }
+
+    return result;
 }

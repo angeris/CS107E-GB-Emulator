@@ -2,6 +2,7 @@
 #define GPU_H
 
 #include "MEM.h"
+#include "gl.h"
 
 /**
  *                  Layout of Tile Sets in memory
@@ -24,6 +25,11 @@
 #define TILE_SET_BG_1 0x9C00
 
 /* Graphics Library */
+#define WHITE 0xFFFFFFFF
+#define LGRAY 0xFFCCCCCC
+#define DGRAY 0xFF777777
+#define BLACK 0xFF000000
+
 // define colors
 #define WIN_WIDTH 160
 #define WIN_HEIGHT 144
@@ -38,7 +44,7 @@
 #define LCDY 0XFF44
 
 /**
- *          Pallettes 
+ *          Palettes 
  *  http://bgb.bircd.org/pandocs.htm#videodisplay
  * -------------------------------------------------
  * Bit 1-0 - Shade for Color 0
@@ -53,9 +59,9 @@
  *     2      Dark Gray    Dark Gray
  *     3      Black        Black
  */
-#define BGPD 0XFF47 // Background Pallette Data 
-#define OBP0 0XFF48  // Object Pallette 0 Data
-#define OBP1 0XFF49 // Object Pallette 1 Data
+#define BGPD 0XFF47 // Background Palette Data 
+#define OBP0 0XFF48  // Object Palette 0 Data
+#define OBP1 0XFF49 // Object Palette 1 Data
 
 /* LCD Control Register */
 #define LCD_CONTROL_REG 0xFF40 // check 
@@ -88,5 +94,6 @@ void gpu_init();
 
 void draw_tile(gb_short control);
 void draw_sprite();
+color get_color(gb_short ncolor, gb_long paladdr);
 
 #endif
