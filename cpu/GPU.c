@@ -5,8 +5,10 @@ static unsigned _gpu_clock;
 static unsigned _gpu_line;
 
 gb_short gpu_read(gb_long addr) {
-    if(addr >= 0x8000 && addr <= 0x9FFF) return vram[addr]; // Not sure if this is correct
-    else return 0;
+    // if(addr >= 0x8000 && addr <= 0x9FFF) 
+    return vram[addr]; // Not sure if this is correct
+    // Have to read from the Sprite OAM located at 0xFE00
+    // else return 0;
 }
 
 void gpu_init() {
@@ -67,7 +69,7 @@ void gpu_writeline() {
     // Check LCD Control Register
     gb_short control = gpu_read(LCD_CONTROL_REG); 
     if(control & BG_DISPLAY_ENAB) draw_tile(control);
-    if(control & OBJ_SPRITE_ENAB) draw_sprite();
+    if(control & OBJ_SPRITE_ENAB) draw_sprite(control);
 }
 
 void gpu_drawscreen() {
@@ -154,7 +156,7 @@ void draw_tile(gb_short control) {
         (data1 << cBit) ? (cNum |= 1) : (cNum |= 0);
 
         // Get actual color from background color palette
-        color c = get_color(cNum, (gb_long)BGPD);
+        color c = get_color(cNum, (gb_long)BGPAL);
         int finalY = gpu_read(LCDY);
 
         // Check To Be Within Bounds
@@ -162,10 +164,75 @@ void draw_tile(gb_short control) {
 
         gl_draw_pixel(px, finalY, c);
     }
-
 }
 
-void draw_sprite() {
+void draw_sprite(gb_short control) {
+    int use8x16sprite = 0; // boolean
+    if(control & OBJ_SPRITE_SIZE) use8x16sprite = 1;
+
+    // Iterate through all the sprites, and check which ones are displayed
+    for(int sprite = 0; sprite < 40; sprite++) {
+        gb_short index = sprite*4; // Each sprite occupies four bytes 
+        gb_short yPos = gpu_read(SPRITE_OAM+index) - 16;
+        gb_short xPos = gpu_read(SPRITE_OAM+index+1)-8;
+        gb_short tileLoc = gpu_read(SPRITE_OAM+index+2);
+        gb_short attributes = gpu_read(SPRITE_OAM+index+3);
+
+        int yflip, xflip;
+        (attributes & YFLIP) ? (yflip = 1) : (yflip = 0);
+        (attributes & XFLIP) ? (xflip = 1) : (xflip = 0);
+
+        int scanline = gpu_read(LCDY);
+
+        int ysize = use8x16sprite ? 16 : 8;
+
+        // Check if current sprite is being written to the current scanline
+        if((scanline >= yPos) && (scanline < (yPos+ysize))) {
+            int line = scanline - yPos;
+            // Check if the sprite is being flipped vertically
+            // If so, read in data backwards
+            if(yflip) {
+                line -= ysize;
+                line *= -1;
+            }
+
+            line *= 2; // Sprites take up 2 bytes
+            gb_long dataAddr = (TILE_SET_1U + (tileLoc * 16)) + line;
+            gb_short data1 = gpu_read(dataAddr);
+            gb_short data2 = gpu_read(dataAddr+1);
+
+            // Reading in pixels from right to left
+            for(int tilePix = 7; tilePix >= 0; tilePix--) {
+                int cBit = tilePix;
+                // Check if the sprite is being flipped horizontally
+                if(xflip) {
+                    cBit -= 7;
+                    cBit *= -1;
+                }
+
+                int cNum;
+                (data2 << cBit) ? (cNum = 1) : (cNum = 0); // Double check this is being done correctly
+                cNum <<= 1;
+                (data1 << cBit) ? (cNum |= 1) : (cNum |= 0);
+
+                // Check which palette to use
+                gb_long cAddr = (attributes & PAL_NO) ? OBPAL1 : OBPAL0;
+                color c = get_color(cNum, cAddr);
+                if(c == WHITE) continue; // white is transparent for sprites
+
+                // Draw pixel to fb
+                int xPix = 0 - tilePix;
+                xPix += 7;
+                int pixel = xPos+xPix;
+
+                // Check that the pixel is within bounds
+                if ((scanline<0) || (scanline>143) || (pixel<0) || (pixel>159)) continue;
+                gl_draw_pixel(pixel, scanline, c);
+            }
+
+        }
+
+    }
 
 }
 

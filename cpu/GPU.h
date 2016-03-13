@@ -30,7 +30,6 @@
 #define DGRAY 0xFF777777
 #define BLACK 0xFF000000
 
-// define colors
 #define WIN_WIDTH 160
 #define WIN_HEIGHT 144
 
@@ -42,6 +41,18 @@
 #define WINDOWY 0xFF4A
 #define WINDOWX 0xFF4B
 #define LCDY 0XFF44
+
+/* LCD Control Register */
+#define LCD_CONTROL_REG 0xFF40 // check 
+
+#define LCD_ENABLE      1<<7
+#define WIN_TILE_SELECT 1<<6
+#define WIN_DISP_ENABLE 1<<5
+#define WIN_BG_TILEDATA 1<<4
+#define BG_TILE_MAP_SEL 1<<3
+#define OBJ_SPRITE_SIZE 1<<2
+#define OBJ_SPRITE_ENAB 1<<1
+#define BG_DISPLAY_ENAB 1<<0
 
 /**
  *          Palettes 
@@ -59,23 +70,22 @@
  *     2      Dark Gray    Dark Gray
  *     3      Black        Black
  */
-#define BGPD 0XFF47 // Background Palette Data 
-#define OBP0 0XFF48  // Object Palette 0 Data
-#define OBP1 0XFF49 // Object Palette 1 Data
 
-/* LCD Control Register */
-#define LCD_CONTROL_REG 0xFF40 // check 
+#define BGPAL 0XFF47 // Background Palette Data 
+#define OBPAL0 0XFF48  // Object Palette 0 Data
+#define OBPAL1 0XFF49 // Object Palette 1 Data
 
-#define LCD_ENABLE      1<<7
-#define WIN_TILE_SELECT 1<<6
-#define WIN_DISP_ENABLE 1<<5
-#define WIN_BG_TILEDATA 1<<4
-#define BG_TILE_MAP_SEL 1<<3
-#define OBJ_SPRITE_SIZE 1<<2
-#define OBJ_SPRITE_ENAB 1<<1
-#define BG_DISPLAY_ENAB 1<<0
-
-/* Sprite Attributes */
+/** 
+ *        Sprite Attributes 
+ * ---------------------------------
+ * All 40 sprites are stored between 0x8000-0x8FFF
+ * All unsigned Values 
+ */
+#define SPRITE_OAM 0xFE00 // Sprite Object Attribute Memory
+#define BG_PRIOR 1<<7
+#define YFLIP 1<<6
+#define XFLIP 1<<5
+#define PAL_NO 1<<4
 
 /* GPU Modes */
 #define MODE_HBLANK 0
@@ -93,7 +103,7 @@ void gpu_drawscreen();
 void gpu_init();
 
 void draw_tile(gb_short control);
-void draw_sprite();
+void draw_sprite(gb_short control);
 color get_color(gb_short ncolor, gb_long paladdr);
 
 #endif
