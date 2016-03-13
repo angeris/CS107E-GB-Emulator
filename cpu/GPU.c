@@ -5,15 +5,6 @@ static unsigned _gpu_mode;
 static unsigned _gpu_clock;
 static unsigned _gpu_line;
 
-// define 
-
-/*
-unsigned int ScrollY; // (0xFF42): The Y Position of the BACKGROUND where to start drawing the viewing area from 
-unsigned int ScrollX; // (0xFF43): The X Position of the BACKGROUND to start drawing the viewing area from
-unsigned int WindowY; // (0xFF4A): The Y Position of the VIEWING AREA to start drawing the window from
-unsigned int WindowX; // (0xFF4B): The X Positions -7 of the VIEWING AREA to start drawing the window from
-*/
-
 gb_short gpu_read(gb_long addr) {
     if(addr >= 0x8000 && addr <= 0x9FFF) return vram[addr]; // Not sure if this is correct
     else return 0;
@@ -108,7 +99,7 @@ void draw_tile(gb_short control) {
     int unsig = 1;
 
     if(control & WIN_DISP_ENABLE) { // Check if current window is within windows Y position
-        if(windowY <= gpu_read(SCROLLY + 2)) { // 0xFF44
+        if(windowY <= gpu_read(LCDY)) {
             windowInUse = 1;
         }
     }
@@ -126,6 +117,9 @@ void draw_tile(gb_short control) {
     } else { // Choose Window Tile Set To Use
         (control & WIN_TILE_SELECT) ? (bgMem = TILE_SET_BG_1) : (bgMem = TILE_SET_BG_0);
     }
+
+    gb_short yPos = 0; // Current scanline being drawn
+    windowInUse ? (yPos = gpu_read(LCDY) - windowY) : (yPos = scrollY + gpu_read(LCDY));
 
 }
 

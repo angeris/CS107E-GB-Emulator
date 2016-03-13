@@ -35,6 +35,7 @@
 #define SCROLLX 0xFF43
 #define WINDOWY 0xFF4A
 #define WINDOWX 0xFF4B
+#define LCDY 0XFF44
 
 /* LCD Control Register */
 #define LCD_CONTROL_REG 0xFF40 // check 
