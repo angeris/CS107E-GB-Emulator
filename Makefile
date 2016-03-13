@@ -59,11 +59,18 @@ install-controller: $(CONTROLLER).bin
 clean :
 	rm -rf *.bin *.exe *.o *.d *.list
 	rm -rf lib/*.bin lib/*.exe lib/*.o lib/*.d lib/*.list
+	rm -rf cpu/*.bin cpu/*.exe cpu/*.o cpu/*.d cpu/*.list
 
 install: $(NAME).bin
 	rpi-install.py $(NAME).bin
 	rm screenlog.0 
 	screen -L /dev/tty.SLAB_USBtoUART 115200
+
+Ubuntuinstall: $(NAME).bin
+	rpi-install.py /dev/ttyUSB0 $(NAME).bin
+	rm screenlog.0 
+	screen -L /dev/ttyUSB0 115200
+
 
 #rom_build: $(ROMS:.gb=.h)
 #
