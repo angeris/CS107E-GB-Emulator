@@ -1149,9 +1149,7 @@ void exec_op(gb_short op_code) {
 	
 	
     case 0xF0:;
-      gb_short next = cpu_read8();
-      setA( read8( 0xFF00 + next) );
-      printf("Address is %x\n", next);
+      setA( read8( 0xFF00 + cpu_read8()) );
       break;
     case 0xF1:
       setAF(readSP());
