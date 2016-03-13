@@ -118,8 +118,57 @@ void draw_tile(gb_short control) {
         (control & WIN_TILE_SELECT) ? (bgMem = TILE_SET_BG_1) : (bgMem = TILE_SET_BG_0);
     }
 
-    gb_short yPos = 0; // Current scanline being drawn
+    gb_short yPos = 0; // Which of the 32 vertical tiles the current scanline is drawing
     windowInUse ? (yPos = gpu_read(LCDY) - windowY) : (yPos = scrollY + gpu_read(LCDY));
+
+    // Choose which of the 8 vertical pixels of the current tile the sanline is on
+    gb_long tileRow = (((gb_short)(yPos/8))*32);
+
+    // Draw horizontal pixels for this scanline
+    gb_short xPos;
+    for(int px = 0; px < 160; px++) {
+        xPos = px+scrollX;
+        if(windowInUse && (px >= windowX)) xPos = px - windowX;
+
+        gb_long tileCol = (xPos/8);
+        gb_long_s tileNum;
+
+        // Get the signed or unsigned tile identity number
+        gb_long tileAddr = bgMem+tileRow+tileCol;
+        if(unsig)
+            tileNum = (gb_short)gpu_read(tileAddr);
+        else 
+            tileNum = (gb_short_s)gpu_read(tileAddr);
+
+        // Find the tile in memory
+        gb_long tileLoc = tileMem;
+        if(unsig)
+            tileLoc += (tileNum * 16);
+        else
+            tileLoc += ((tileNum+128)*16);
+
+        // Find data from the correct vertical line of the current tile
+        gb_short line = yPos % 8;
+        line *= 2; // each vertical line takes up two bytes of memory
+        gb_short data1 = gpu_read(tileLoc + line);
+        gb_short data2 = gpu_read(tileLoc + line + 1);
+
+        // Pixel 0 in the tile is bit 7 of data1 and data2
+        // What's going on  here?
+        int cBit = xPos % 8;
+        cBit -= 7;
+        cBit *= -1;
+
+        // Combine data1 and data2 to get color id for this pixel
+        int cNum;
+        (data2 << cBit) ? (cNum = 1) : (cNum = 0); // Double check this is being done correctly
+        cNum <<= 1;
+        (data1 << cBit) ? (cNum |= 1) : (cNum |= 0);
+
+        // Get actual color from background color palette
+
+        // Write to the framebuffer via graphics library
+    }
 
 }
 

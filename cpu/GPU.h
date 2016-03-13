@@ -37,6 +37,26 @@
 #define WINDOWX 0xFF4B
 #define LCDY 0XFF44
 
+/**
+ *          Pallettes 
+ *  http://bgb.bircd.org/pandocs.htm#videodisplay
+ * -------------------------------------------------
+ * Bit 1-0 - Shade for Color 0
+ * Bit 3-2 - Shade for Color 1
+ * Bit 5-4 - Shade for Color 2
+ * Bit 7-6 - Shade for Color 3
+ * -------------------------------------------------
+ * Color # | BGP Mode   | OBP Mode 0 and 1
+ * =============================================
+ *     0      White        Transparent
+ *     1      Light Gray   Light Gray
+ *     2      Dark Gray    Dark Gray
+ *     3      Black        Black
+ */
+#define BGPD 0XFF47 // Background Pallette Data 
+#define OBP0 0XFF48  // Object Pallette 0 Data
+#define OBP1 0XFF49 // Object Pallette 1 Data
+
 /* LCD Control Register */
 #define LCD_CONTROL_REG 0xFF40 // check 
 
