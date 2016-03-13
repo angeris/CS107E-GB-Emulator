@@ -28,6 +28,7 @@
 #define VRAM_SIZE 8192
 #define MEM_SIZE  0x10000 // 0x0000 - 0xFFFF
 #define OAM_SIZE  160 // 0xFE00 - 0xFEA0
+#define IO_SIZE 0x80 //0xFF00 - 0XFF7F
 #define HRAM_SIZE 127 // 0xFF80 - 0xFFFE
 
 // Memory map
@@ -37,6 +38,7 @@ gb_short vram[VRAM_SIZE];
 gb_short _gb_mem[MEM_SIZE];
 gb_short _gb_hram[MEM_SIZE];
 gb_short _gb_oam[OAM_SIZE];
+gb_short _gb_io[IO_SIZE];
 
 // Other definitions
 gb_short   read8(gb_long addr);
