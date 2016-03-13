@@ -65,6 +65,12 @@ install: $(NAME).bin
 	rm screenlog.0 
 	screen -L /dev/tty.SLAB_USBtoUART 115200
 
+Ubuntuinstall: $(NAME).bin
+	rpi-install.py /dev/ttyUSB0 $(NAME).bin
+	rm screenlog.0 
+	screen -L /dev/ttyUSB0 115200
+
+
 #rom_build: $(ROMS:.gb=.h)
 #
 #%.h: %.gb
