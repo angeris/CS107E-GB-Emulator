@@ -59,6 +59,7 @@ install-controller: $(CONTROLLER).bin
 clean :
 	rm -rf *.bin *.exe *.o *.d *.list
 	rm -rf lib/*.bin lib/*.exe lib/*.o lib/*.d lib/*.list
+	rm -rf cpu/*.bin cpu/*.exe cpu/*.o cpu/*.d cpu/*.list
 
 install: $(NAME).bin
 	rpi-install.py $(NAME).bin
