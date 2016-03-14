@@ -44,6 +44,12 @@ install-gpu: $(GPU).bin
 	rm screenlog.0 
 	screen -L /dev/tty.SLAB_USBtoUART 115200
 
+Ubuntuinstall-gpu: $(GPU).bin
+	rpi-install.py /dev/ttyUSB0 $(GPU).bin
+	rm screenlog.0 
+	screen -L /dev/ttyUSB0 115200
+
+
 # Controller Specific Make - don't know if this is correct/efficient but it works
 $(CONTROLLER).exe : $(S_SRCS:.s=.o) $(CONTROLLER_SRCS:.c=.o)
 	$(LD) $(LDFLAGS) $^ $(LDLIBS) -o $@
@@ -79,8 +85,7 @@ clean :
 	rm -rf cpu/*.bin cpu/*.exe cpu/*.o cpu/*.d cpu/*.list
 	rm -rf controller/*.bin controller/*.exe controller/*.o controller/*.d controller/*.list
 	rm -rf roms/*.d
-	clear
-	
+	clear	
 
 install: $(NAME).bin
 	rpi-install.py $(NAME).bin
