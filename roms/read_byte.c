@@ -3,6 +3,8 @@
 
 
 int main() {
-    printf("At 0x156 : %02x\n", GB_ROM[0x155]);
+    for(int i=0x150; i<0x160; i++) {
+        printf("At 0x%04x : 0x%02x\n",i, GB_ROM[i]);
+    }
     return 0;
 }

@@ -13,6 +13,8 @@ void exec_op(gb_short op_code);
 gb_short cpu_read8();
 gb_long cpu_read16();
 
+gb_long PC();
+
 // Flags:
 
 #define F_ZERO (1<<7)
