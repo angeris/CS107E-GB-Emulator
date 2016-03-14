@@ -61,10 +61,10 @@ gb_short read8(gb_long addr) {
         if(addr == 0xFF00) {
             if(_joypad_switch & (1<<4)) {
                 controller_state cs = getState();
-                return cs.DOWN << 3 | cs.UP << 2 | cs.LEFT << 1 | cs.RIGHT;
+                return !cs.DOWN << 3 | !cs.UP << 2 | !cs.LEFT << 1 | !cs.RIGHT;
             } else {
                 controller_state cs = getState();
-                return cs.START << 3 | cs.SELECT << 2 | cs.B << 1 | cs.A;
+                return !cs.START << 3 | !cs.SELECT << 2 | !cs.B << 1 | !cs.A;
             }
         }
         return _gb_io[addr - 0xFF00];
