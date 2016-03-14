@@ -23,12 +23,6 @@ void gpu_init() {
 
 void gpu_exec() {
     _gpu_clock += 4;
-    
-    /*
-    printf("_gpu_clock = %d\n", _gpu_clock);
-    printf("_gpu_mode = %d\n", _gpu_mode);
-    printf("_gpu_line = %d\n", _gpu_line);
-    */
 
     switch(_gpu_mode) {
         case MODE_HBLANK:
