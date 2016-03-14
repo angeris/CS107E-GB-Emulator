@@ -90,7 +90,16 @@ void init_cpu() {
     setHL(0x014D);
     setSP(0xFFFE);
     setPC(0x0100);
-    writey
+    write8(0xFF40, 0x91);
+	write8(0xFF42, 0);
+	write8(0xFF43, 0);
+	write8(0XFF45, 0);
+	write8(0xFF47, 0XFC);
+	write8(0xFF48, 0XFF);
+	write8(0XFF49, 0XFF)L
+	write8(0xFF4A, 0);
+	write8(0XFF4B, 0);
+	write8(0xFFFF, 0);
 }
 
 // Read helpers (for clarity)
