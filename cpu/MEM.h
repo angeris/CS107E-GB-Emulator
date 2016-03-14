@@ -31,6 +31,12 @@
 #define IO_SIZE 0x80 //0xFF00 - 0XFF7F
 #define HRAM_SIZE 127 // 0xFF80 - 0xFFFE
 
+// Additional Memory Addresses 
+#define CART_TYPE_ADDR  0x0147
+#define RAM_SIZE_ADDR   0x0149
+
+
+
 // Memory map
 //extern gb_short GB_ROM[ROM_SIZE]; // To be read from a given .h file.
 gb_short *_gb_ram;
@@ -51,5 +57,9 @@ gb_long    read16(gb_long addr);
 // Available functions
 void write8(gb_long addr, gb_short val);
 void write16(gb_long addr, gb_long val);
+
+void setIME(gb_short flag);
+gb_short getIME();
+
 
 #endif

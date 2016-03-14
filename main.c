@@ -10,6 +10,7 @@ void impossible_vector(unsigned pc) {
 
 void interrupt_vector(unsigned pc) {
     gb_halt = 0;
+    
     return;
 }
 
