@@ -1,10 +1,32 @@
 #include "MEM.h"
+#include "GPU.h"
 
 static unsigned _mbc;
 static unsigned _rom_bank;
 static unsigned _ram_bank;
 static gb_short _ram_enabled;
 static gb_short _ime_enabled;
+
+void gpu_testing() {
+    printf("GPU TESTING VRAM INT-----------\n");
+    for(int i = 0x8000; i < 0x9FFF; i++) {
+        int n = i - 0x8000;
+        vram[n] = 0xFF;
+        // printf("vram[%x] = 0xFF\n",n); 
+    }
+
+    write8(SCROLLY, 0);
+    write8(SCROLLX, 0);
+    write8(WINDOWY, 0);
+    write8(WINDOWX, 0);
+    write8(LCDY, 0);
+
+    write8(LCD_CONTROL_REG, 0xFF);
+    gb_short lcr = read8(LCD_CONTROL_REG);
+    printf("LCD CONTROL REG = %x\n",lcr);
+
+
+}
 
 extern gb_short get_joypad_input(); //XXX: Or whatever this is
 

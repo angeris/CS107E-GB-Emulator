@@ -74,6 +74,7 @@ void clock_pulse(void) {
 void controller_int_handler(unsigned pc) {
 	update_global_controller_state();
 	clear_timer_interrupt_1();
+	
 	schedule_timer_interrupt();
 }
 
