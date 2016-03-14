@@ -207,7 +207,7 @@ static gb_short rot8_l_carry(gb_short reg) {
 }
 
 static void jump_relative() {
-	setPC(_cpr.PC + cpu_read8s());
+	setPC(cpu_read8s() + PC());
 	
 }
 
