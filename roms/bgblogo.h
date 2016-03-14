@@ -1,7 +1,8 @@
 
 #ifndef BGB_H
 #define BGB_H
+#include "DATA_TYPES.h"
 
-unsigned char bgblogo_gb[];
+extern gb_short GB_ROM[];
 
 #endif

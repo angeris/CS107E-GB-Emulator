@@ -73,7 +73,7 @@ static inline void setPC(gb_long a) {
 
 
 void init_cpu() {
-    setAF(0x01B0);
+    setAF(0x11B0);
     setBC(0x0013);
     setDE(0x00D8);
     setHL(0x014D);
@@ -207,7 +207,7 @@ static gb_short rot8_l_carry(gb_short reg) {
 }
 
 static void jump_relative() {
-	setPC(_cpr.PC + read8s(_cpr.PC) + 1);
+	setPC(_cpr.PC + cpu_read8s());
 	
 }
 
@@ -281,14 +281,13 @@ static gb_short or8(gb_short val) {
 }
 
 
-static gb_short cp8(gb_short val) {
+static void cp8(gb_short val) {
 	gb_short a = A();
 	unsigned f = (unsigned)a - (unsigned)val;
 	setZero(f == 0);
 	setSubs(1);
 	setCarr((gb_short)f > a);
 	setHalf(0);
-	return (gb_short)f;
 }
 
 
@@ -946,28 +945,28 @@ void exec_op(gb_short op_code) {
       setA( or8( A() ) );
       break;
     case 0xB8:
-      setA( cp8( B() ) );
+      cp8( B() ) ;
       break;
     case 0xB9:
-      setA( cp8( C() ) );
+      cp8( C() );
       break;
     case 0xBA:
-      setA( cp8( D() ) );
+      cp8( D() );
       break;
     case 0xBB:
-      setA( cp8( E() ) );
+      cp8( E() );
       break;
     case 0xBC:
-      setA( cp8( F() ) );
+      cp8( F() );
       break;
     case 0xBD:
-      setA( cp8( L() ) );
+      cp8( L() );
       break;
     case 0xBE:
-      setA( cp8( read8( HL() ) ) );
+      cp8( read8( HL() ) );
       break;
     case 0xBF:
-      setA( cp8( A() ) );
+      cp8( A() );
       break;	
 	
 	
@@ -1173,7 +1172,7 @@ void exec_op(gb_short op_code) {
 	
 	
     case 0xF0:
-      printf("Gotten to instruction 0xF0 on PC : %02x", PC());
+      // printf("Gotten to instruction 0xF0 on PC : %02x", PC());
       setA( read8( 0xFF00 + cpu_read8()) );
       break;
     case 0xF1:
@@ -1221,7 +1220,7 @@ void exec_op(gb_short op_code) {
     case 0xFD:
       break;
     case 0xFE:
-      setA( cp8( cpu_read8() ) );
+      cp8( cpu_read8() );
       break;
     case 0xFF:
       reset(0x38);

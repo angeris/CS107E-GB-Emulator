@@ -13,12 +13,12 @@ gb_short gpu_read(gb_long addr) {
 
 void gpu_init() {
     gl_init( WIN_WIDTH, WIN_HEIGHT, 0);
-    printf("gpu_init\n");
+    // printf("gpu_init\n");
 
-    printf("tile set1u= %x\n", read8(TILE_SET_1U));
-    printf("tile set1s= %x\n", read8s(TILE_SET_1S));
-    printf("tile bg0= %x\n", read8(TILE_SET_BG_0));
-    printf("tile bg1= %x\n", read8(TILE_SET_BG_1));
+    // printf("tile set1u= %x\n", read8(TILE_SET_1U));
+    // printf("tile set1s= %x\n", read8s(TILE_SET_1S));
+    // printf("tile bg0= %x\n", read8(TILE_SET_BG_0));
+    // printf("tile bg1= %x\n", read8(TILE_SET_BG_1));
 }
 
 void gpu_exec() {
@@ -70,6 +70,8 @@ void gpu_writeline() {
 
     // Check LCD Control Register
     gb_short control = read8(LCD_CONTROL_REG); 
+    // printf("LCD Control REG %x\n", control);
+
     if(control & BG_DISPLAY_ENAB) {
         draw_tile(control);
     }
@@ -80,6 +82,7 @@ void gpu_writeline() {
 }
 
 void gpu_drawscreen() {
+    // printf("this is where we'd normally draw the screen\n");
     // gl_swap_buffer();
 }
 
@@ -103,20 +106,27 @@ void draw_tile(gb_short control) {
 
     // Choose Tile Data to Use
     if(control & WIN_BG_TILEDATA) {
+
         tileMem = TILE_SET_1U;
+        // printf("We're using unsigned tiles!\n");
     } else {
+        // printf("We're using signed tiles!\n");
         tileMem = TILE_SET_1S;
         unsig = 0; 
     }
 
     if(!usingWindow) { // Choose Background Tile Set To Use
+        // printf("using window!\n");
         (control & BG_TILE_MAP_SEL) ? (bgMem = TILE_SET_BG_1) : (bgMem = TILE_SET_BG_0);
     } else { // Choose Window Tile Set To Use
         (control & WIN_TILE_SELECT) ? (bgMem = TILE_SET_BG_1) : (bgMem = TILE_SET_BG_0);
     }
 
-    gb_short yPos = 0; // Which of the 32 vertical tiles is the current scanline is drawing
-    usingWindow ? (yPos = read8(LCDY) - windowY) : (yPos = scrollY + read8(LCDY));
+    // printf("bgmem =%x\n",bgMem);
+
+    // Which of the 32 vertical tiles is the current scanline is drawing
+    gb_short yPos = usingWindow ? (read8(LCDY) - windowY) : (scrollY + read8(LCDY));
+    // printf("yPos%d\n", yPos);
 
     // Choose which of the 8 vertical pixels of the current tile the scanline is on
     gb_long tileRow = (((gb_short)(yPos/8))*32);
@@ -132,10 +142,15 @@ void draw_tile(gb_short control) {
 
         // Get the signed or unsigned tile identity number
         gb_long tileAddr = bgMem+tileRow+tileCol;
+
+        printf("tileAddr %x\n", tileAddr);
+
         if(unsig)
-            tileNum = (gb_short)read8(tileAddr);
+            tileNum = read8(tileAddr);
         else 
-            tileNum = (gb_short_s)read8s(tileAddr);
+            tileNum = read8s(tileAddr);
+
+        printf("tileNum %d\n", tileNum);
 
         // Find the tile in memory
         gb_long tileLoc = tileMem;
@@ -147,6 +162,7 @@ void draw_tile(gb_short control) {
         // Find data from the correct vertical line of the current tile
         gb_short line = yPos % 8;
         line *= 2; // each vertical line takes up two bytes of memory
+
         gb_short data1 = read8(tileLoc + line);
         gb_short data2 = read8(tileLoc + line + 1);
 
@@ -158,12 +174,11 @@ void draw_tile(gb_short control) {
 
         // Combine data1 and data2 to get color id for this pixel
         int cNum;
-        (data2 << cBit) ? (cNum = 1) : (cNum = 0); // Double check this is being done correctly
-        cNum <<= 1;
-        (data1 << cBit) ? (cNum |= 1) : (cNum |= 0);
+        cNum = (!!(data2 & (1 << cBit)) << 1) | (!!(data1 & (1 << cBit))); // Double check this is being done correctly
 
         // Get actual color from background color palette
         color c = get_color(cNum, (gb_long)BGPAL);
+        // printf("cnum=%d\n",cNum);
         int finalY = read8(LCDY); 
 
         // Check To Be Within Bounds
@@ -223,9 +238,7 @@ void draw_sprite(gb_short control) {
                 }
 
                 int cNum;
-                (data2 << cBit) ? (cNum = 1) : (cNum = 0); // Double check this is being done correctly
-                cNum <<= 1;
-                (data1 << cBit) ? (cNum |= 1) : (cNum |= 0);
+                cNum = (!!(data2 & (1 << cBit)) << 1) | (!!(data1 & (1 << cBit)));
 
                 // Check which palette to use
                 gb_long cAddr = (attributes & PAL_NO) ? OBPAL1 : OBPAL0;
