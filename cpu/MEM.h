@@ -4,9 +4,9 @@
 #include "printf.h"
 #include "malloc.h"
 // #include "cpu_instrs.h"
-#include "bgblogo.h"
+// #include "bgblogo.h"
 //#include "supermarioland.h"
-// #include "tetris.h"
+#include "tetris.h"
 #include "DATA_TYPES.h"
 
 /* 

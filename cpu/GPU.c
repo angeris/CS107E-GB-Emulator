@@ -110,7 +110,6 @@ void draw_tile(gb_short control) {
         tileMem = TILE_SET_1U;
     } else {
         tileMem = TILE_SET_1S;
-        unsig = 0; 
     }
     // printf("tileMem = %x\n", tileMem);
 
@@ -140,11 +139,25 @@ void draw_tile(gb_short control) {
         // Get the signed or unsigned tile identity number
         gb_long tileAddr = bgMem+tileRow+tileCol;
 
+        /*
+        int goodloop = 0;
+        if(read8(tileAddr) > 0){
+            printf("tileAddr %x, tileNum= %d\n", tileAddr, read8(tileAddr));
+            goodloop = 1;
+        }
+        */
+
         if(unsig) {
-            tileNum = read8(tileAddr);
+            tileNum = (gb_short)4;
         } else {
             tileNum = read8s(tileAddr);
         }
+
+        /*
+        if(tileNum > 0) {
+            printf("tileNum = %d\n", tileNum);
+        }
+        */
 
         // Find the tile in memory
         gb_long tileLoc = tileMem;
