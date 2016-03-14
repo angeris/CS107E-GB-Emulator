@@ -48,7 +48,7 @@ void controller_init(void) {
 
 	// Enable interrupts
   	system_enable_interrupts();
-	schedule_timer_interrupt(); 
+	// schedule_timer_interrupt(); 
 }
 
 /*
@@ -74,7 +74,6 @@ void clock_pulse(void) {
 void controller_int_handler(unsigned pc) {
 	update_global_controller_state();
 	clear_timer_interrupt_1();
-	
 	schedule_timer_interrupt();
 }
 

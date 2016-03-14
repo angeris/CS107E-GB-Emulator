@@ -4,8 +4,6 @@ static unsigned _gpu_mode;
 static unsigned _gpu_clock;
 static unsigned _gpu_line;
 
-// TODO use read8
-
 gb_short gpu_read(gb_long addr) {
     // if(addr >= 0x8000 && addr <= 0x9FFF) 
     return vram[addr]; //  bNot sure if this is correct
@@ -14,7 +12,7 @@ gb_short gpu_read(gb_long addr) {
 }
 
 void gpu_init() {
-    gl_init( WIN_WIDTH, WIN_HEIGHT, 1);
+    gl_init( WIN_WIDTH, WIN_HEIGHT, 0);
     printf("gpu_init\n");
 
     printf("tile set1u= %x", read8(TILE_SET_1U));
@@ -69,33 +67,41 @@ void gpu_exec() {
     }
 }
 
+gb_short scrollcount = 0;
 void gpu_writeline() {
 
     // Check LCD Control Register
     gb_short control = read8(LCD_CONTROL_REG); 
     if(control & BG_DISPLAY_ENAB) {
-        printf("draw line!\n");
         draw_tile(control);
     }
 
     if(control & OBJ_SPRITE_ENAB){
-        printf("draw sprite!\n");
         draw_sprite(control);
     }
+
+    /*
+    if(scrollcount < 140) scrollcount++;
+    else
+        scrollcount = 0;
+    write8(SCROLLY, scrollcount);
+    write8(WINDOWY, scrollcount);
+    printf("SCROLLY = %x\n", read8(SCROLLY));
+    printf("scrollcount = %x\n", scrollcount);
+    */
 }
 
 void gpu_drawscreen() {
-    // printf("drawscreen(), clock=%d\n",_gpu_clock);
-    gl_swap_buffer();
+    // gl_swap_buffer();
 }
 
 void draw_tile(gb_short control) {
     gb_long tileMem = 0;
     gb_long bgMem = 0;
 
-    gb_short scrollY = read8(SCROLLY) ;
-    gb_short scrollX = read8(SCROLLX) ;
-    gb_short windowY = read8(WINDOWY) ;
+    gb_short scrollY = read8(SCROLLY);
+    gb_short scrollX = read8(SCROLLX);
+    gb_short windowY = read8(WINDOWY);
     gb_short windowX = read8(WINDOWX) - 7;
 
     int usingWindow = 0; // boolean - whether or not the window is in use
@@ -170,14 +176,18 @@ void draw_tile(gb_short control) {
 
         // Get actual color from background color palette
         color c = get_color(cNum, (gb_long)BGPAL);
-        int finalY = read8(LCDY);
+        // int finalY = read8(LCDY); 
+        int finalY = _gpu_line;
 
         // Check To Be Within Bounds
         if ((finalY<0) || (finalY>143) || (px<0) || (px>159)) {
             printf("background drawing out of bounds!\n");
             continue;
+        } else {
+            // printf("end of draw tile!\n");
         }
         gl_draw_pixel(px, finalY, c);
+        // printf("drawing tile pixel x=%d, finalY=%d, c =%x\n", px, finalY, c);
     }
 }
 
@@ -246,6 +256,7 @@ void draw_sprite(gb_short control) {
                     continue;
                 }
                 gl_draw_pixel(pixel, scanline, c);
+                // printf("drawing sprite pixel x=%d, y=%d, c =%x\n", pixel, scanline, c);
             }
 
         }

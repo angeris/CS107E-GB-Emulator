@@ -9,10 +9,9 @@ static gb_short _ime_enabled;
 
 void gpu_testing() {
     printf("GPU TESTING VRAM INT-----------\n");
-    for(int i = 0x8000; i < 0x9FFF; i++) {
-        int n = i - 0x8000;
-        vram[n] = 0xFF;
-        // printf("vram[%x] = 0xFF\n",n); 
+    for(int i = 0x8000; i < 0x9FFF; i+=2) {
+        write8(i, 0xFF);
+        write8(i+1, 0xD8); // binary for 11011000
     }
 
     write8(SCROLLY, 0);
@@ -24,6 +23,11 @@ void gpu_testing() {
     write8(LCD_CONTROL_REG, 0xFF);
     gb_short lcr = read8(LCD_CONTROL_REG);
     printf("LCD CONTROL REG = %x\n",lcr);
+
+    write8(BGPAL, 0xD8); // binary for 11011000
+    write8(OBPAL0, 0xD8); // binary for 11011000
+    write8(OBPAL1, 0xD8); // binary for 11011000
+    write8(SPRITE_OAM, 0x00);
 
 
 }

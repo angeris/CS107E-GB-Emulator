@@ -19,8 +19,8 @@
  * FE00-FE9F   Sprite Attribute Table (OAM)
  */
 
-#define TILE_SET_1U 0x8000 /* Unsigned Tile Region */
-#define TILE_SET_1S 0x8800 /* Signed Tile Region */
+#define TILE_SET_1U   0x8000 /* Unsigned Tile Region */
+#define TILE_SET_1S   0x8800 /* Signed Tile Region */
 #define TILE_SET_BG_0 0x9800
 #define TILE_SET_BG_1 0x9C00
 
@@ -30,7 +30,7 @@
 #define DGRAY 0xFF777777
 #define BLACK 0xFF000000
 
-#define WIN_WIDTH 160
+#define WIN_WIDTH  160
 #define WIN_HEIGHT 144
 
 /* Primarily Drawn From - http://www.codeslinger.co.uk/pages/projects/gameboy/graphics.html */
@@ -40,7 +40,7 @@
 #define SCROLLX 0xFF43
 #define WINDOWY 0xFF4A
 #define WINDOWX 0xFF4B
-#define LCDY 0XFF44
+#define LCDY    0XFF44
 
 /* LCD Control Register */
 #define LCD_CONTROL_REG 0xFF40 // check 
@@ -71,8 +71,8 @@
  *     3      Black        Black
  */
 
-#define BGPAL 0XFF47 // Background Palette Data 
-#define OBPAL0 0XFF48  // Object Palette 0 Data
+#define BGPAL  0XFF47 // Background Palette Data 
+#define OBPAL0 0XFF48 // Object Palette 0 Data
 #define OBPAL1 0XFF49 // Object Palette 1 Data
 
 /** 
@@ -83,9 +83,9 @@
  */
 #define SPRITE_OAM 0xFE00 // Sprite Object Attribute Memory
 #define BG_PRIOR 1<<7
-#define YFLIP 1<<6
-#define XFLIP 1<<5
-#define PAL_NO 1<<4
+#define YFLIP    1<<6
+#define XFLIP    1<<5
+#define PAL_NO   1<<4
 
 /* GPU Modes */
 #define MODE_HBLANK 0
