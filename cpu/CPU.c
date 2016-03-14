@@ -90,7 +90,6 @@ void init_cpu() {
     setHL(0x014D);
     setSP(0xFFFE);
     setPC(0x0100);
-    writey
 }
 
 // Read helpers (for clarity)
