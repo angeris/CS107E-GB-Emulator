@@ -8,6 +8,8 @@ static unsigned _ram_bank;
 static gb_short _ram_enabled;
 static gb_short _ime_enabled;
 static gb_short _interrupts;
+static gb_short _joypad_switch;
+static gb_short _joypad_status;
 
 extern gb_short get_joypad_input(); //XXX: Or whatever this is
 
@@ -55,8 +57,18 @@ gb_short read8(gb_long addr) {
         return _gb_oam[addr - 0xFE00];
     if(addr >= 0xFEA0 && addr < 0xFF00)
         return 0;
-    if(addr >= 0xFF00 && addr < 0xFF80)
+    if(addr >= 0xFF00 && addr < 0xFF80) {
+        if(addr == 0xFF00) {
+            if(_joypad_switch & (1<<4)) {
+                controller_state cs = getState();
+                return cs.DOWN << 3 | cs.UP << 2 | cs.LEFT << 1 | cs.RIGHT;
+            } else {
+                controller_state cs = getState();
+                return cs.START << 3 | cs.SELECT << 2 | cs.B << 1 | cs.A;
+            }
+        }
         return _gb_io[addr - 0xFF00];
+    }
     if(addr >= 0xFF80 && addr < 0xFFFF)
         return _gb_hram[addr - 0xFF80];
     if(addr == 0xFFFF)
@@ -105,8 +117,9 @@ void write8(gb_long addr, gb_short val) {
     else if(addr >= 0xFE00 && addr < 0xFEA0) 
         _gb_oam[addr - 0xFE00] = val;
     else if(addr >= 0xFF00 && addr < 0XFF80)  {
-        _gb_io[addr - 0xFF00] = val;
-        if(addr == 0xFF40) printf("Value written to GPU register : %02x\n, on PC = %04x\n", val, PC()-1);
+        if(addr == 0xFF00) _joypad_switch = val&0xF0;
+        else 
+            _gb_io[addr - 0xFF00] = val;
     }
     else if(addr >= 0xFF80 && addr < 0xFFFF)
         _gb_hram[addr - 0xFF80] = val;

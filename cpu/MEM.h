@@ -8,6 +8,7 @@
 //#include "supermarioland.h"
 // #include "tetris.h"
 #include "DATA_TYPES.h"
+#include "controller.h"
 
 /* 
  *         Layout of memory (taken from Pan Docs)
