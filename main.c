@@ -9,6 +9,8 @@ void impossible_vector(unsigned pc) {
 }
 
 void interrupt_vector(unsigned pc) {
+    gb_halt = 0;
+    
     return;
 }
 
@@ -20,7 +22,7 @@ void main(void) {
     printf("Finished flushing\n");
     //while(1) {printf("WTF"); for(int i=0; i<1000000; i++);}
     while(1) {
-       cpu_step(); // Should be done if there is no halting.
+       if(!gb_halt) cpu_step(); // Should be done if there is no halting.
        //check interrupts:
        //if interrupt, then call correct given vector (unless GPU, then just call it whenever the interrupt occurs)
        //

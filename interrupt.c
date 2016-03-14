@@ -9,7 +9,7 @@
  * 60 milliseconds is 0.06 seconds
  * In interrupt will happen approximately 17 times per second
  */
-#define INTDELAY 60 
+#define INTDELAY 16667 // 1/60 s ~ 16,667 us
 
 #define CS 0x20003000 // System Timer Control and Status (Timer Base)
 #define CLO 0x20003004 // System Timer Counter Lower 32 bits
@@ -31,7 +31,7 @@ void clear_timer_interrupt_1(void) {
  * pre-defined interrup delay
  */
 void schedule_timer_interrupt(void) {
-	PUT32(C1, *(volatile unsigned int *)CLO + (INTDELAY * 1000));
+	PUT32(C1, *(volatile unsigned int *)CLO + (INTDELAY));
 }
 
 /* Alternate  clear_timer_interrupt_1 Implementation */

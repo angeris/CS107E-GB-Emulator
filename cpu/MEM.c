@@ -6,6 +6,7 @@ static unsigned _rom_bank;
 static unsigned _ram_bank;
 static gb_short _ram_enabled;
 static gb_short _ime_enabled;
+static gb_short _interrupts;
 
 void gpu_testing() {
     printf("GPU TESTING VRAM INT-----------\n");
@@ -35,8 +36,23 @@ void gpu_testing() {
 extern gb_short get_joypad_input(); //XXX: Or whatever this is
 
 void init() {
-    _gb_ram = (gb_short*)malloc(4096); //Allocate normal RAM for testing
-    //TODO: Allocate _gb_ram according to cartridge specs 
+    switch(GB_ROM[RAM_SIZE_ADDR]) {
+    case 0x00:
+        _gb_ram = (gb_short*)malloc(0);
+        break;
+    case 0x01:
+        _gb_ram = (gb_short*)malloc(2048);
+        break;
+    case 0x02:
+        _gb_ram = (gb_short*)malloc(8192);
+        break;
+    case 0x03:
+        _gb_ram = (gb_short*)malloc(32*1024);
+        break;
+    default:
+        printf("Error reading RAM_SIZE_ADDR with value : %02x", GB_ROM[RAM_SIZE_ADDR]);
+        break;
+    }
 }
 
 gb_short read8(gb_long addr) {
@@ -52,10 +68,10 @@ gb_short read8(gb_long addr) {
         return vram[addr - 0x8000];
 
     if(addr >= 0xA000 && addr < 0xC000) {
-        if(_mbc != 0) 
+        if(_mbc != 0 && _ram_enabled) 
             return _gb_ram[addr - 0xA000 + (_ram_bank << 13)]; // multiply by 0x2000
-        else
-            return _gb_ram[addr - 0xA000];
+        else 
+            return _gb_mem[addr]; // If ram isn't enabled or we don't have additional ram, just write to _gb_mem and return whatever's in it.
     }
     if(addr >= 0xC000 && addr < 0xFE00)
         return _gb_mem[addr]; // Not strictly necessary, but nice to be explicit
@@ -65,11 +81,10 @@ gb_short read8(gb_long addr) {
         return 0;
     if(addr >= 0xFF00 && addr < 0xFF80)
         return _gb_io[addr - 0xFF00];
-      //return 0; // Currently not implemented
     if(addr >= 0xFF80 && addr < 0xFFFF)
         return _gb_hram[addr - 0xFF80];
     if(addr == 0xFFFF)
-        return _ime_enabled;
+        return _interrupts;
 
     printf("Something is accessing wrong memory at : 0x%04x (READ)", addr);
     return _gb_mem[addr];
@@ -97,8 +112,8 @@ void write8(gb_long addr, gb_short val) {
     else if(addr >= 0x8000 && addr < 0xA000)
         vram[addr - 0x8000] = val;
     else if(addr >= 0xA000 && addr < 0xC000 && _ram_enabled) { 
-        if(_mbc) _gb_ram[addr - 0xA000 + (_ram_bank << 13)] = val;
-        else _gb_ram[addr - 0xA000] = val;
+        if(_mbc && _ram_enabled) _gb_ram[addr - 0xA000 + (_ram_bank << 13)] = val;
+        else _gb_mem[addr] = val; // Same as read8
     }
     else if(addr >= 0xC000 && addr < 0xE000) {
         _gb_mem[addr] = val;
@@ -115,7 +130,7 @@ void write8(gb_long addr, gb_short val) {
     else if(addr >= 0xFF80 && addr < 0xFFFF)
         _gb_hram[addr - 0xFF80] = val;
     else if(addr == 0xFFFF)
-        _ime_enabled = val;
+        _interrupts = val;
     else
         _gb_mem[addr] = val;
 }
@@ -125,5 +140,5 @@ void write16(gb_long addr, gb_long val) {
     write8(addr+1, (gb_short)(val>>8));
 }
 
-void setIME(unsigned flag) { _ime_enabled = !!flag; }
-gb_long getIME() { return _ime_enabled; }
+void setIME(gb_short flag) { _ime_enabled = !!flag; }
+gb_short getIME() { return _ime_enabled; }

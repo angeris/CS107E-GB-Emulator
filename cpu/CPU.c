@@ -25,18 +25,7 @@ struct {
 
 } _cpr;
 
-void cpu_step() {
-    unsigned _af = AF();
-    unsigned _bc = BC();
-    unsigned _de = DE();
-    unsigned _hl = HL();
-    unsigned _sp = SP();
-    unsigned _pc = PC()+1;
-    unsigned _opcode = read8(PC());
-    
-    printf("AF:0x%04x,BC:0x%04x,DE:0x%04x,HL:0x%04x,SP:0x%04x,PC:0x%04x,OP:0x%02x\n", _af, _bc, _de, _hl, _sp, _pc, _opcode); 
-    exec_op(cpu_read8());
-}
+
 
 // Mem access
 gb_short cpu_read8() {
@@ -84,12 +73,22 @@ static inline void setPC(gb_long a) {
 
 
 void init_cpu() {
-    setAF(0x11B0);
+    setAF(0x01B0);
     setBC(0x0013);
     setDE(0x00D8);
     setHL(0x014D);
     setSP(0xFFFE);
     setPC(0x0100);
+    write8(0xFF40, 0x91);
+	write8(0xFF42, 0); // No need for the 0 writes.
+	write8(0xFF43, 0);
+	write8(0XFF45, 0);
+	write8(0xFF47, 0XFC);
+	write8(0xFF48, 0XFF);
+	write8(0XFF49, 0XFF);
+	write8(0xFF4A, 0);
+	write8(0XFF4B, 0);
+	write8(0xFFFF, 0);
 }
 
 // Read helpers (for clarity)
@@ -341,6 +340,31 @@ static void reset(gb_long val) {
 	setPC(val);
 }
 
+// Jump and link register
+static inline void brlx(gb_long val) {
+    reset(val);
+}
+
+void cpu_step() {
+    unsigned _af = AF();
+    unsigned _bc = BC();
+    unsigned _de = DE();
+    unsigned _hl = HL();
+    unsigned _sp = SP();
+    unsigned _pc = PC()+1;
+    unsigned _opcode = read8(PC());
+    
+    printf("AF:0x%04x,BC:0x%04x,DE:0x%04x,HL:0x%04x,SP:0x%04x,PC:0x%04x,OP:0x%02x\n", _af, _bc, _de, _hl, _sp, _pc, _opcode); 
+    gb_short interrupts = read8(INT_FLAG);
+    if(getIME()) {
+        if(interrupts & INT_VBLANK)         { brlx(INT_VBLANK_ADDR);    }
+        else if(interrupts & INT_LCDSTAT)   { brlx(INT_LCDC_ADDR);      }
+        else if(interrupts & INT_TIMER)     { brlx(INT_TIMER_ADDR);     }
+        else if(interrupts & INT_SERIAL)    { brlx(INT_SERIAL_ADDR);    }
+        else if(interrupts & INT_JOYPAD)    { brlx(INT_JOYPAD_ADDR);    }
+    }
+    exec_op(cpu_read8());
+}
 
 // CPU operations
 void exec_op(gb_short op_code) {
@@ -716,7 +740,7 @@ void exec_op(gb_short op_code) {
       write8( HL(), L() );
       break;
     case 0x76:
-      //halt <- should probably have a halt flag that waits until the next interrupt
+      gb_halt = 1;
       break;
     case 0x77:
       write8( HL(), A() );
@@ -1159,7 +1183,7 @@ void exec_op(gb_short op_code) {
       setA( read8( C() ) );
       break;
     case 0xF3:
-      //disable interrupts
+      setIME(0);
       break;
     case 0xF4:
       break;
@@ -1189,7 +1213,7 @@ void exec_op(gb_short op_code) {
       setA( read8( cpu_read16() ) );
       break;
     case 0xFB:
-      //enable interrupts
+      setIME(1);
       break;
     case 0xFC:
       break;
