@@ -287,7 +287,7 @@ static void cp8(gb_short val) {
 	setZero(f == 0);
 	setSubs(1);
 	setCarr((gb_short)f > a);
-	setHalf(0);
+	setHalf((a&0xF) < (val&0xF));
 }
 
 
