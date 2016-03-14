@@ -46,7 +46,7 @@ void gl_clear(color c) {
 }
 
 void gl_draw_pixel(int x, int y, color c) {
-    if(x >= _state.width || y >= _state.height) return;
+    // if(x >= _state.width || y >= _state.height) return;
     color (*buf)[_state.width] = (color (*)[_state.width])_state.curr_buf;
     buf[y][x] = c;
 }

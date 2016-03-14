@@ -41,7 +41,7 @@ void gpu_exec() {
         }
         break;
         case MODE_VBLANK:
-        if(_gpu_clock >= 4560) {
+        if(_gpu_clock >= 456) {
             if(!_gpu_is_vblank) {
                 _gpu_is_vblank=1;
                 gb_short interrupts = read8(INT_FLAG);
@@ -52,6 +52,7 @@ void gpu_exec() {
             _gpu_clock = 0;
             gb_halt = 0;
             if(_gpu_line > 153) {
+                // printf("VBLANK ENABLED\n");
                 _gpu_line = 0;
                 _gpu_mode = MODE_READOM;
             }
@@ -65,6 +66,7 @@ void gpu_exec() {
         break;
         case MODE_READAL:
         if(_gpu_clock >= 169) {
+            // printf("Gettin on HBLANK mode");
             _gpu_mode = MODE_HBLANK;
             _gpu_clock = 0;
             gpu_writeline();
@@ -85,15 +87,21 @@ void gpu_writeline() {
 
     if(control & BG_DISPLAY_ENAB) {
         draw_tile(control);
+        // printf("draw tile control register is on!!\n");
         // printf("still drawing tiles\n");
+    } else {
+        // printf("that shit is fo\n");
     }
 
     if(control & OBJ_SPRITE_ENAB){
+        // printf("draw sprite register is on!!\n");
         draw_sprite(control);
     }
 }
 
 void gpu_drawscreen() {
+    // write8(0xFF40, 0x91);
+    // printf("Resetting lcd crongsadfsf\n");
     // printf("this is where we'd normally draw the screen\n");
     // gl_swap_buffer();
 }
@@ -129,9 +137,9 @@ void draw_tile(gb_short control) {
 
     if(!usingWindow) { // Choose Background Tile Set To Use
         // printf("using window!\n");
-        bgMem = (control & BG_TILE_MAP_SEL) ? (TILE_SET_BG_1) : (TILE_SET_BG_1);
+        bgMem = (control & BG_TILE_MAP_SEL) ? (TILE_SET_BG_1) : (TILE_SET_BG_0);
     } else { // Choose Window Tile Set To Use
-        bgMem = (control & WIN_TILE_SELECT) ? (TILE_SET_BG_1) : (TILE_SET_BG_1);
+        bgMem = (control & WIN_TILE_SELECT) ? (TILE_SET_BG_1) : (TILE_SET_BG_0);
     }
 
     // printf("bgmem =%x\n",bgMem);
@@ -155,7 +163,13 @@ void draw_tile(gb_short control) {
         // Get the signed or unsigned tile identity number
         gb_long tileAddr = bgMem+tileRow+tileCol;
 
-        //printf("tileAddr %x\n", tileAddr);
+        /*
+        int goodloop = 0;
+        if(read8(tileAddr) > 0) {
+            printf("tileAddr:%x = %d\n", tileAddr, read8(tileAddr));
+            goodloop = 1;
+        }
+        */
 
         if(unsig) {
             // printf("read8(tileAddr)=%x\n",read8(tileAddr));
@@ -164,8 +178,6 @@ void draw_tile(gb_short control) {
             // printf("read8(tileAddr)=%x\n",read8s(tileAddr));
             tileNum = read8s(tileAddr);
         }
-
-        //printf("tileNum %d\n", tileNum);
 
         // Find the tile in memory
         gb_long tileLoc = tileMem;
@@ -181,6 +193,13 @@ void draw_tile(gb_short control) {
         gb_short data1 = read8(tileLoc + line);
         gb_short data2 = read8(tileLoc + line + 1);
 
+        /*
+        if(goodloop) {
+            printf("data1 = %02x\n", data1);
+            printf("data2 = %02x\n", data2);
+        }
+        */
+
         // Pixel 0 in the tile is bit 7 of data1 and data2
         // What's going on here?
         int cBit = xPos % 8;
@@ -192,13 +211,30 @@ void draw_tile(gb_short control) {
         cNum = (!!(data2 & (1 << cBit)) << 1) | (!!(data1 & (1 << cBit))); // Double check this is being done correctly
 
         // Get actual color from background color palette
-        color c = get_color(cNum, (gb_long)BGPAL);
-        // printf("cnum=%d\n",cNum);
+        // color c = get_color(cNum, (gb_long)BGPAL);
+        color c;
+        switch(cNum) {
+            case 0:
+            c = WHITE;
+            break;
+            case 1:
+            c = LGRAY;
+            break;
+            case 2:
+            c = DGRAY;
+            break;
+            case 3:
+            c = BLACK;
+            break;
+        }
+
+        // if(goodloop) printf("cnum=%d\n",cNum);
         int finalY = read8(LCDY); 
 
         // Check To Be Within Bounds
+        // if(goodloop) printf("finalY = %d, px = %d, c = %x\n", finalY, px, c);
         if ((finalY<0) || (finalY>143) || (px<0) || (px>159)) {
-            printf("background drawing out of bounds!\n");
+            // printf("background drawing out of bounds!\n");
             continue;
         } else {
             // printf("end of draw tile!\n");
@@ -257,7 +293,24 @@ void draw_sprite(gb_short control) {
 
                 // Check which palette to use
                 gb_long cAddr = (attributes & PAL_NO) ? OBPAL1 : OBPAL0;
-                color c = get_color(cNum, cAddr);
+                // color c = get_color(cNum, cAddr);
+
+                color c;
+                switch(cNum) {
+                    case 0:
+                    c = WHITE;
+                    break;
+                    case 1:
+                    c = LGRAY;
+                    break;
+                    case 2:
+                    c = DGRAY;
+                    break;
+                    case 3:
+                    c = BLACK;
+                    break;
+                }
+
                 if(c == WHITE) continue; // white is transparent for sprites
 
                 // Draw pixel to fb
@@ -267,7 +320,7 @@ void draw_sprite(gb_short control) {
 
                 // Check that the pixel is within bounds
                 if ((scanline<0) || (scanline>143) || (pixel<0) || (pixel>159)) {
-                    printf("sprite drawing out of bounds!\n");
+                    // printf("sprite drawing out of bounds!\n");
                     continue;
                 }
                 gl_draw_pixel(pixel, scanline, c);
