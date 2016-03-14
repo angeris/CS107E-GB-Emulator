@@ -1096,7 +1096,7 @@ void exec_op(gb_short op_code) {
 		
 		
     case 0xE0:
-      write8(0XFF00 + cpu_read8(), A());
+      write8(0xFF00 + cpu_read8(), A());
       break;
     case 0xE1:
       setHL(readSP());
@@ -1148,8 +1148,8 @@ void exec_op(gb_short op_code) {
       break;	
 	
 	
-    case 0xF0:
-      setA( read8( 0xFF00 | cpu_read8() ) );
+    case 0xF0:;
+      setA( read8( 0xFF00 + cpu_read8()) );
       break;
     case 0xF1:
       setAF(readSP());

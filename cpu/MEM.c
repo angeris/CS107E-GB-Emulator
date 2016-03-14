@@ -60,7 +60,8 @@ gb_short read8(gb_long addr) {
     if(addr >= 0xFEA0 && addr < 0xFF00)
         return 0;
     if(addr >= 0xFF00 && addr < 0xFF80)
-        return 0; // Currently not implemented
+        return _gb_io[addr - 0xFF00];
+      //return 0; // Currently not implemented
     if(addr >= 0xFF80 && addr < 0xFFFF)
         return _gb_hram[addr - 0xFF80];
     if(addr == 0xFFFF)
@@ -105,6 +106,8 @@ void write8(gb_long addr, gb_short val) {
     }
     else if(addr >= 0xFE00 && addr < 0xFEA0) 
         _gb_oam[addr - 0xFE00] = val;
+    else if(addr >= 0xFF00 && addr < 0XFF80) 
+        _gb_io[addr - 0xFF00] = val;
     else if(addr >= 0xFF80 && addr < 0xFFFF)
         _gb_hram[addr - 0xFF80] = val;
     else if(addr == 0xFFFF)
