@@ -86,8 +86,8 @@ void write8(gb_long addr, gb_short val) {
     }
     else if(addr >= 0x8000 && addr < 0xA000) {
         vram[addr - 0x8000] = val;
-        // if(addr >= 0x9800 && addr <= 0x9FFF)
-            // printf("We're writing %02x to %04x\n", val, addr);
+        if(addr >= 0x9800 && addr <= 0x9FFF)
+            printf("We're writing %02x to %04x\n", val, addr);
     }
     else if(addr >= 0xA000 && addr < 0xC000 && _ram_enabled) {
         if(_mbc && _ram_enabled) _gb_ram[addr - 0xA000 + (_ram_bank << 13)] = val;

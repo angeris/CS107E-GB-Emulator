@@ -3,6 +3,7 @@
 static unsigned _gpu_mode;
 static unsigned _gpu_clock;
 static unsigned _gpu_line;
+static unsigned _gpu_is_vblank;
 
 gb_short gpu_read(gb_long addr) {
     // if(addr >= 0x8000 && addr <= 0x9FFF) 
@@ -13,6 +14,7 @@ gb_short gpu_read(gb_long addr) {
 
 void gpu_init() {
     gl_init( WIN_WIDTH, WIN_HEIGHT, 0);
+    _gpu_is_vblank = 0;
     // printf("gpu_init\n");
 
     // printf("tile set1u= %x\n", read8(TILE_SET_1U));
@@ -29,7 +31,6 @@ void gpu_exec() {
         if(_gpu_clock >= 201) {
             _gpu_clock = 0;
             _gpu_line++;
-            write8(LCDY, _gpu_line);
 
             if(_gpu_line>=143) {
                 _gpu_mode = MODE_VBLANK;
@@ -41,12 +42,19 @@ void gpu_exec() {
         break;
         case MODE_VBLANK:
         if(_gpu_clock >= 4560) {
+            if(!_gpu_is_vblank) {
+                _gpu_is_vblank=1;
+                gb_short interrupts = read8(INT_FLAG);
+                write8(INT_FLAG, interrupts | INT_VBLANK);
+            }
             _gpu_mode = MODE_READOM;
-            _gpu_line = 0;
+            _gpu_line++;
             _gpu_clock = 0;
             gb_halt = 0;
-            gb_short interrupts = read8(INT_FLAG);
-            write8(INT_FLAG, interrupts | INT_VBLANK);
+            if(_gpu_line > 153) {
+                _gpu_line = 0;
+                _gpu_mode = MODE_READOM;
+            }
         }
         break;
         case MODE_READOM:
@@ -63,17 +71,21 @@ void gpu_exec() {
         }
         break;
     }
+    write8(LCDY, _gpu_line);
+
 }
 
 gb_short scrollcount = 0;
 void gpu_writeline() {
-
+    // printf("LCDY= %d\n", read8(LCDY));
     // Check LCD Control Register
     gb_short control = read8(LCD_CONTROL_REG); 
     // printf("LCD Control REG %x\n", control);
+    // write8(LCD_CONTROL_REG, 0x91);
 
     if(control & BG_DISPLAY_ENAB) {
         draw_tile(control);
+        // printf("still drawing tiles\n");
     }
 
     if(control & OBJ_SPRITE_ENAB){
@@ -143,14 +155,17 @@ void draw_tile(gb_short control) {
         // Get the signed or unsigned tile identity number
         gb_long tileAddr = bgMem+tileRow+tileCol;
 
-        printf("tileAddr %x\n", tileAddr);
+        // printf("tileAddr %x\n", tileAddr);
 
-        if(unsig)
+        if(unsig) {
+            // printf("read8(tileAddr)=%x\n",read8(tileAddr));
             tileNum = read8(tileAddr);
-        else 
+        } else {
+            // printf("read8(tileAddr)=%x\n",read8s(tileAddr));
             tileNum = read8s(tileAddr);
+        }
 
-        printf("tileNum %d\n", tileNum);
+        // printf("tileNum %d\n", tileNum);
 
         // Find the tile in memory
         gb_long tileLoc = tileMem;
