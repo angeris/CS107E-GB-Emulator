@@ -1172,7 +1172,8 @@ void exec_op(gb_short op_code) {
       break;	
 	
 	
-    case 0xF0:;
+    case 0xF0:
+      printf("Gotten to instruction 0xF0 on PC : %02x", PC());
       setA( read8( 0xFF00 + cpu_read8()) );
       break;
     case 0xF1:
