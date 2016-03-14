@@ -57,7 +57,6 @@ gb_long    read16(gb_long addr);
 // Available functions
 void write8(gb_long addr, gb_short val);
 void write16(gb_long addr, gb_long val);
-void gpu_testing();
 
 void setIME(gb_short flag);
 gb_short getIME();

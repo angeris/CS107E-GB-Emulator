@@ -26,6 +26,6 @@ void main(void) {
     while(1) {
         if(!gb_halt) cpu_step();
     	gpu_exec();
-    	// if(getState().R) reboot();
+    	if(getState().R) reboot();
     }
 }
