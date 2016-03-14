@@ -1,6 +1,8 @@
 #include "proto.h"
 #include "gpio.h"
 #include "GPU.h"
+#include "CPU.h"
+#include "MEM.h"
 #include "timer.h"
 #include "controller.h"
 
@@ -19,9 +21,10 @@ void interrupt_vector(unsigned pc) {
 void main(void) {
     delay(3);
     gpu_init();
-    gpu_testing();
+    init_cpu();
     controller_init();
     while(1) {
+        if(!gb_halt) cpu_step();
     	gpu_exec();
     	if(getState().R) reboot();
     }

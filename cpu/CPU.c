@@ -357,11 +357,11 @@ void cpu_step() {
     printf("AF:0x%04x,BC:0x%04x,DE:0x%04x,HL:0x%04x,SP:0x%04x,PC:0x%04x,OP:0x%02x\n", _af, _bc, _de, _hl, _sp, _pc, _opcode); 
     gb_short interrupts = read8(INT_FLAG);
     if(getIME()) {
-        if(interrupts & INT_VBLANK)         { brlx(INT_VBLANK_ADDR);    }
-        else if(interrupts & INT_LCDSTAT)   { brlx(INT_LCDC_ADDR);      }
-        else if(interrupts & INT_TIMER)     { brlx(INT_TIMER_ADDR);     }
-        else if(interrupts & INT_SERIAL)    { brlx(INT_SERIAL_ADDR);    }
-        else if(interrupts & INT_JOYPAD)    { brlx(INT_JOYPAD_ADDR);    }
+        if(interrupts & INT_VBLANK)         { brlx(INT_VBLANK_ADDR);    interrupts &= ~INT_VBLANK;}
+        else if(interrupts & INT_LCDSTAT)   { brlx(INT_LCDC_ADDR);      interrupts &= ~INT_LCDSTAT; }
+        else if(interrupts & INT_TIMER)     { brlx(INT_TIMER_ADDR);     interrupts &= ~INT_TIMER; }
+        else if(interrupts & INT_SERIAL)    { brlx(INT_SERIAL_ADDR);    interrupts &= ~INT_SERIAL; }
+        else if(interrupts & INT_JOYPAD)    { brlx(INT_JOYPAD_ADDR);    interrupts &= ~INT_JOYPAD; }
     }
     exec_op(cpu_read8());
 }
