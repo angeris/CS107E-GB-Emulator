@@ -25,7 +25,7 @@ S_SRCS = start.s
 ROMS = Pokemon_Red.gb Tetris.gb
 
 CONTROLLER_SRCS = $(CONTROLLER).c cstart.c malloc.c printf.c gl.c fb.c interrupt.c controller/controller.c 
-GPU_SRCS = $(GPU).c cstart.c malloc.c printf.c gl.c fb.c interrupt.c controller/controller.c cpu/GPU.c cpu/MEM.c roms/bgblogo.c cpu/CPU.c
+GPU_SRCS = $(GPU).c cstart.c malloc.c printf.c gl.c fb.c interrupt.c controller/controller.c cpu/GPU.c cpu/MEM.c roms/supermarioland.c cpu/CPU.c
 
 # all : $(NAME).bin
 all : $(GPU).c
