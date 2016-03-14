@@ -64,7 +64,8 @@ gb_short read8(gb_long addr) {
                 return !cs.DOWN << 3 | !cs.UP << 2 | !cs.LEFT << 1 | !cs.RIGHT;
             } else {
                 controller_state cs = getState();
-                return !cs.START << 3 | !cs.SELECT << 2 | !cs.B << 1 | !cs.A;
+                gb_short temp = !cs.START << 3 | !cs.SELECT << 2 | !cs.B << 1 | !cs.A;
+                return temp;
             }
         }
         return _gb_io[addr - 0xFF00];
