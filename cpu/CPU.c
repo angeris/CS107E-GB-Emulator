@@ -354,7 +354,7 @@ void cpu_step() {
     unsigned _pc = PC()+1;
     unsigned _opcode = read8(PC());
     
-    printf("AF:0x%04x,BC:0x%04x,DE:0x%04x,HL:0x%04x,SP:0x%04x,PC:0x%04x,OP:0x%02x\n", _af, _bc, _de, _hl, _sp, _pc, _opcode); 
+    // printf("AF:0x%04x,BC:0x%04x,DE:0x%04x,HL:0x%04x,SP:0x%04x,PC:0x%04x,OP:0x%02x\n", _af, _bc, _de, _hl, _sp, _pc, _opcode); 
     gb_short interrupts = read8(INT_FLAG);
     if(getIME()) {
         if(interrupts & INT_VBLANK)         { brlx(INT_VBLANK_ADDR);    interrupts &= ~INT_VBLANK;}

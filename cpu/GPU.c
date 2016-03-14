@@ -171,7 +171,6 @@ void draw_tile(gb_short control) {
         // Get actual color from background color palette
         color c = get_color(cNum, (gb_long)BGPAL);
         int finalY = read8(LCDY); 
-        // int finalY = _gpu_line;
 
         // Check To Be Within Bounds
         if ((finalY<0) || (finalY>143) || (px<0) || (px>159)) {
