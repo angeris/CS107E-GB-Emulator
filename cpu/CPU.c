@@ -84,12 +84,13 @@ static inline void setPC(gb_long a) {
 
 
 void init_cpu() {
-    setAF(0x11B0);
+    setAF(0x01B0);
     setBC(0x0013);
     setDE(0x00D8);
     setHL(0x014D);
     setSP(0xFFFE);
     setPC(0x0100);
+    writey
 }
 
 // Read helpers (for clarity)
