@@ -106,7 +106,7 @@ void write8(gb_long addr, gb_short val) {
         _gb_oam[addr - 0xFE00] = val;
     else if(addr >= 0xFF00 && addr < 0XFF80)  {
         _gb_io[addr - 0xFF00] = val;
-        if(addr == 0xFF40) printf("Value written to GPU register : %02x\n, on PC = %04x\n", val, PC()-1);
+        //if(addr == 0xFF40) printf("Value written to GPU register : %02x\n, on PC = %04x\n", val, PC()-1);
     }
     else if(addr >= 0xFF80 && addr < 0xFFFF)
         _gb_hram[addr - 0xFF80] = val;
