@@ -41,3 +41,6 @@ roms/*.h
 *~
 *.bin
 *.swo
+
+# Screenlogs
+*.0

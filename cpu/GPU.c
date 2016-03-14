@@ -15,10 +15,10 @@ void gpu_init() {
     gl_init( WIN_WIDTH, WIN_HEIGHT, 0);
     printf("gpu_init\n");
 
-    printf("tile set1u= %x", read8(TILE_SET_1U));
-    printf("tile set1s= %x", read8s(TILE_SET_1S));
-    printf("tile bg0= %x", read8(TILE_SET_BG_0));
-    printf("tile bg1= %x", read8(TILE_SET_BG_1));
+    printf("tile set1u= %x\n", read8(TILE_SET_1U));
+    printf("tile set1s= %x\n", read8s(TILE_SET_1S));
+    printf("tile bg0= %x\n", read8(TILE_SET_BG_0));
+    printf("tile bg1= %x\n", read8(TILE_SET_BG_1));
 }
 
 void gpu_exec() {
@@ -35,8 +35,7 @@ void gpu_exec() {
         if(_gpu_clock >= 201) {
             _gpu_clock = 0;
             _gpu_line++;
-            write8(LCDY, (gb_short)_gpu_line);
-            // printf("%s\n", );
+            write8(LCDY, _gpu_line);
 
             if(_gpu_line>=143) {
                 _gpu_mode = MODE_VBLANK;
@@ -72,11 +71,6 @@ void gpu_exec() {
 gb_short scrollcount = 0;
 void gpu_writeline() {
 
-    printf("check lcd control register - ");
-    gb_short lcr = read8(LCD_CONTROL_REG);
-    printf("LCD CONTROL REG = %x\n",lcr);
-
-
     // Check LCD Control Register
     gb_short control = read8(LCD_CONTROL_REG); 
     if(control & BG_DISPLAY_ENAB) {
@@ -86,16 +80,6 @@ void gpu_writeline() {
     if(control & OBJ_SPRITE_ENAB){
         draw_sprite(control);
     }
-
-    /*
-    if(scrollcount < 140) scrollcount++;
-    else
-        scrollcount = 0;
-    write8(SCROLLY, scrollcount);
-    write8(WINDOWY, scrollcount);
-    printf("SCROLLY = %x\n", read8(SCROLLY));
-    printf("scrollcount = %x\n", scrollcount);
-    */
 }
 
 void gpu_drawscreen() {
