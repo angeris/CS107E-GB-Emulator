@@ -110,6 +110,7 @@ void draw_tile(gb_short control) {
         tileMem = TILE_SET_1U;
     } else {
         tileMem = TILE_SET_1S;
+        unsig = 0;
     }
     // printf("tileMem = %x\n", tileMem);
 
