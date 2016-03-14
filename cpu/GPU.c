@@ -129,9 +129,9 @@ void draw_tile(gb_short control) {
 
     if(!usingWindow) { // Choose Background Tile Set To Use
         // printf("using window!\n");
-        (control & BG_TILE_MAP_SEL) ? (bgMem = TILE_SET_BG_1) : (bgMem = TILE_SET_BG_0);
+        bgMem = (control & BG_TILE_MAP_SEL) ? (TILE_SET_BG_1) : (TILE_SET_BG_1);
     } else { // Choose Window Tile Set To Use
-        (control & WIN_TILE_SELECT) ? (bgMem = TILE_SET_BG_1) : (bgMem = TILE_SET_BG_0);
+        bgMem = (control & WIN_TILE_SELECT) ? (TILE_SET_BG_1) : (TILE_SET_BG_1);
     }
 
     // printf("bgmem =%x\n",bgMem);
@@ -155,7 +155,7 @@ void draw_tile(gb_short control) {
         // Get the signed or unsigned tile identity number
         gb_long tileAddr = bgMem+tileRow+tileCol;
 
-        // printf("tileAddr %x\n", tileAddr);
+        printf("tileAddr %x\n", tileAddr);
 
         if(unsig) {
             // printf("read8(tileAddr)=%x\n",read8(tileAddr));
@@ -165,7 +165,7 @@ void draw_tile(gb_short control) {
             tileNum = read8s(tileAddr);
         }
 
-        // printf("tileNum %d\n", tileNum);
+        printf("tileNum %d\n", tileNum);
 
         // Find the tile in memory
         gb_long tileLoc = tileMem;
