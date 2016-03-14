@@ -40,6 +40,9 @@ gb_short _gb_hram[MEM_SIZE];
 gb_short _gb_oam[OAM_SIZE];
 gb_short _gb_io[IO_SIZE];
 
+// Flags and stuff
+gb_short gb_halt;
+
 // Other definitions
 gb_short   read8(gb_long addr);
 gb_short_s read8s(gb_long addr);

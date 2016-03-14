@@ -39,7 +39,6 @@ gb_short read8(gb_long addr) {
         return 0;
     if(addr >= 0xFF00 && addr < 0xFF80)
         return _gb_io[addr - 0xFF00];
-      //return 0; // Currently not implemented
     if(addr >= 0xFF80 && addr < 0xFFFF)
         return _gb_hram[addr - 0xFF80];
     if(addr == 0xFFFF)

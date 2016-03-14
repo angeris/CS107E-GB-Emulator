@@ -716,7 +716,7 @@ void exec_op(gb_short op_code) {
       write8( HL(), L() );
       break;
     case 0x76:
-      //halt <- should probably have a halt flag that waits until the next interrupt
+      gb_halt = 1;
       break;
     case 0x77:
       write8( HL(), A() );

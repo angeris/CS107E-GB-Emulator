@@ -41,3 +41,4 @@ roms/*.h
 .*.swp
 *~
 *.bin
+*.swo
