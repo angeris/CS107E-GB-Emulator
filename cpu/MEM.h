@@ -3,7 +3,8 @@
 
 #include "printf.h"
 #include "malloc.h"
-#include "cpu_instrs.h"
+//#include "cpu_instrs.h"
+#include "bgblogo.h"
 #include "DATA_TYPES.h"
 
 /* 

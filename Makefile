@@ -102,6 +102,7 @@ Ubuntuinstall: $(NAME).bin
 rom_dump:
 	xxd -i roms/Pokemon_Red.gb > roms/Pokemon_Red.h
 	xxd -i roms/cpu_instrs.gb > roms/cpu_instrs.h
+	xxd -i roms/bgblogo.gb > roms/bgblogo.c
 
 .PHONY: all clean
 
