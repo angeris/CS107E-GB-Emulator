@@ -35,6 +35,8 @@ void gpu_exec() {
         if(_gpu_clock >= 201) {
             _gpu_clock = 0;
             _gpu_line++;
+            write8(LCDY, (gb_short)_gpu_line);
+            // printf("%s\n", );
 
             if(_gpu_line>=143) {
                 _gpu_mode = MODE_VBLANK;
@@ -69,6 +71,11 @@ void gpu_exec() {
 
 gb_short scrollcount = 0;
 void gpu_writeline() {
+
+    printf("check lcd control register - ");
+    gb_short lcr = read8(LCD_CONTROL_REG);
+    printf("LCD CONTROL REG = %x\n",lcr);
+
 
     // Check LCD Control Register
     gb_short control = read8(LCD_CONTROL_REG); 
@@ -176,8 +183,8 @@ void draw_tile(gb_short control) {
 
         // Get actual color from background color palette
         color c = get_color(cNum, (gb_long)BGPAL);
-        // int finalY = read8(LCDY); 
-        int finalY = _gpu_line;
+        int finalY = read8(LCDY); 
+        // int finalY = _gpu_line;
 
         // Check To Be Within Bounds
         if ((finalY<0) || (finalY>143) || (px<0) || (px>159)) {

@@ -19,7 +19,7 @@ void interrupt_vector(unsigned pc) {
 void main(void) {
     delay(3);
     gpu_init();
-    gpu_testing();
+    // gpu_testing();
     controller_init();
     while(1) {
     	gpu_exec();
