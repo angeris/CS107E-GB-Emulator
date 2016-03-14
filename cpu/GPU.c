@@ -51,7 +51,7 @@ void gpu_exec() {
             _gpu_line = 0;
             _gpu_clock = 0;
             gb_halt = 0;
-            interrupts = read8(INT_FLAG);
+            gb_short interrupts = read8(INT_FLAG);
             write8(INT_FLAG, interrupts | INT_VBLANK);
         }
         break;

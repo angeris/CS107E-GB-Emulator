@@ -1,6 +1,7 @@
 #ifndef GPU_H
 #define GPU_H
 
+#include "CPU.h"
 #include "MEM.h"
 #include "gl.h"
 
