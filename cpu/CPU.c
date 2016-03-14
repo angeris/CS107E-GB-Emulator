@@ -368,11 +368,11 @@ void cpu_step() {
 
 // CPU operations
 void exec_op(gb_short op_code) {
-    if(counter++ > 40000) {
-        printf("We're done!");
-        reboot();
-        while(1); // Hang
-    }
+//    if(counter++ > 40000) {
+//        printf("We're done!");
+//        reboot();
+//        while(1); // Hang
+//    }
 
     
     switch(op_code) {
