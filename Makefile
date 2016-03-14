@@ -25,9 +25,10 @@ S_SRCS = start.s
 ROMS = Pokemon_Red.gb Tetris.gb
 
 CONTROLLER_SRCS = $(CONTROLLER).c cstart.c malloc.c printf.c gl.c fb.c interrupt.c controller/controller.c 
-GPU_SRCS = $(GPU).c cstart.c malloc.c printf.c gl.c fb.c interrupt.c controller/controller.c cpu/GPU.c cpu/MEM.c roms/cpu_instrs.c
+GPU_SRCS = $(GPU).c cstart.c malloc.c printf.c gl.c fb.c interrupt.c controller/controller.c cpu/GPU.c cpu/MEM.c roms/cpu_instrs.c cpu/CPU.c
 
-all : $(NAME).bin
+# all : $(NAME).bin
+all : $(GPU).c
 
 # GPU Specific Make
 $(GPU).exe : $(S_SRCS:.s=.o) $(GPU_SRCS:.c=.o)
